@@ -1,14 +1,18 @@
 from pyspark import SparkContext
 
-def treat_inmatriculation(sc: SparkContext):
+def treat_inmatriculation(spark: SparkContext):
         
-    inmatriculation = sc.textFile("/user/hduser/inmatriculation.csv")
-    # Split each line of the csv files by the delimiter ";"
-    inmatriculation = inmatriculation.map(lambda line: line.split(";"))
+     #Read CSV into DataFrame
+    immatriculation = spark.read.option("delimiter", ";").csv("/user/hduser/immatriculation.csv", header=True)
 
-    # Remove the header of each csv file
-    inmatriculation_header = inmatriculation.first()
-    inmatriculation = inmatriculation.filter(lambda line: line != inmatriculation_header)
-
-    # Create a RDD for each csv file
-    inmatriculationRDD = inmatriculation.map(lambda line: (line[0], line[1], line[2], line[3]))
+    # Drop rows with null values
+    immatriculation = immatriculation.na.drop()
+    
+    # Transformer les valeurs de la colonne "couleur"
+    immatriculation = immatriculation.map(lambda cols: (
+        cols[0], cols[1], cols[2], cols[3], cols[4], cols[5], cols[6], "grise" if cols[7] == "gris" else "blanche" if cols[7] == "blanc" else "bleue" if cols[7] == "bleu" else cols[7], cols[8], cols[9]
+    ))
+    
+    # Afficher le résultat
+    for row in immatriculation.collect():
+        print(row)
