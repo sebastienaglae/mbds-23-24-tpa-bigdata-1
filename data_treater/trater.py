@@ -1,23 +1,21 @@
-from pyspark import SparkContext
+from pyspark.sql import SparkSession
 from cardealer_treater import treat_cardealer
 from client_treater import treat_client
 from inmatriculation_treater import treat_inmatriculation
 from marketing_treater import treat_marketing
 
 def treat_all():
-    # Create a SparkContext object
-    sc = SparkContext(appName="TreaterApplication")
+    # Create a SparkSession
+    spark = SparkSession.builder.appName("TreaterApplication").getOrCreate()
 
-    treat_cardealer(sc)
-    treat_client(sc)
-    treat_inmatriculation(sc)
-    treat_marketing(sc)
+    # Call the treaters with the SparkSession
+    treat_cardealer(spark)
+    treat_client(spark)
+    treat_inmatriculation(spark)
+    treat_marketing(spark)
 
-    # Stop the SparkContext when you're done
-    sc.stop()
+    # Stop the SparkSession when you're done
+    spark.stop()
 
 if __name__ == "__main__":
     treat_all()
-
-
-
