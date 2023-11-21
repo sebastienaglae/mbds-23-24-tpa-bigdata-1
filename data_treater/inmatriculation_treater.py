@@ -13,6 +13,9 @@ def treat_inmatriculation(spark: SparkContext):
         cols[0], cols[1], cols[2], cols[3], cols[4], cols[5], cols[6], "grise" if cols[7] == "gris" else "blanche" if cols[7] == "blanc" else "bleue" if cols[7] == "bleu" else cols[7], cols[8], cols[9]
     ))
     
+    #Supprimer les lignes avec des caracteres "?"
+    immatriculation = immatriculation.filter(lambda row: all("?" not in col for col in row))
+    
     # Afficher le résultat
     for row in immatriculation.collect():
         print(row)
