@@ -1,29 +1,37 @@
-from pyspark import SparkContext
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, when
 
-def treat_client(spark: SparkContext):
+def treat_client():
+    # Initialiser le contexte Spark
+    spark = SparkSession.builder.appName("example").getOrCreate()
 
+    # Lire le CSV dans un DataFrame
+    client = spark.read.option("delimiter", ";").csv("C:/Users/vince/Documents/Cours_MBDS/Projet_TPA/TPA_BIGDATA/TPA_BIGDATA/Groupe_TPA_2/M2_DMA_Clients_12/Clients_11.csv", header=True)
 
-     #Read CSV into DataFrame
-    client = spark.read.option("delimiter", ";").csv("/user/hduser/client.csv", header=True)
+    # Transformer les valeurs de la colonne "sexe"
+    client = client.withColumn(
+        "gender", 
+        when(col("_c1").isin(["Homme", "H", "Masculin"]), "Homme").otherwise("Femme")
+    ).select("_c0", "gender", "_c2", "_c3", "_c4", "_c5", "_c6")
 
-    # Drop rows with null values
+    # Effacer les lignes avec des éléments NaN dans toutes les colonnes du fichier client
     client = client.na.drop()
-    
-     # Transformer les valeurs de la colonne "sexe"
-    client = client.map(lambda cols: (cols[0], "Homme" if cols[1] in ["Homme", "H", "Masculin"] else "Femme" if cols[1] in ["Femme", "Féminin"] else cols[1], cols[2], cols[3], cols[4], cols[5], cols[6]))
-    
-     #Effacer les lignes avec des elements NaN dans toutes les colonnes du fichier client
-    client = client.filter(lambda row: all(col is not None for col in row))
-    
-    #Effacer les lignes ayant des carateres "?" dans toutes les colonnes du fichier client
-    client = client.filter(lambda row: all("?" not in col for col in row))
-    
-    #Remplacons les elements "Seul" et "Seule" par "Celibataire" et "Marie(e)" par "En couple". On conserve uniquement "En couple" et "Célibataire"
-    client = client.map(lambda cols: (cols[0], cols[1], cols[2], "Célibataire" if cols[3] in ["Célibataire"] else "En couple" if cols[3] in ["En couple", "Marié(e)"] else "Célibataire", cols[2], cols[3], cols[4], cols[5], cols[6]))
 
+    # Effacer les lignes ayant des caractères "?" dans toutes les colonnes du fichier client
+    client = client.filter(~col("_c0").contains("?") & ~col("gender").contains("?") & ~col("_c2").contains("?") & ~col("_c3").contains("?") & ~col("_c4").contains("?") & ~col("_c5").contains("?") & ~col("_c6").contains("?"))
+
+    # Remplacer les éléments "Seul" et "Seule" par "Celibataire" et "Marie(e)" par "En couple". On conserve uniquement "En couple" et "Célibataire"
+    client = client.withColumn(
+        "marital_status",
+        when(col("_c3").isin(["Célibataire"]), "Célibataire").otherwise("En couple")
+    ).select("_c0", "gender", "_c2", "marital_status", "_c4", "_c5", "_c6")
 
     # Afficher le client résultant
-    for row in client.collect():
-        print(row)
-        
-   
+    client.show()
+
+    # Arrêter le contexte Spark
+    spark.stop()
+    
+    # Appeler la fonction pour exécuter le traitement
+    treat_client()
+

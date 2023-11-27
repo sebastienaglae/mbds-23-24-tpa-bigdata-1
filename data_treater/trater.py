@@ -9,10 +9,10 @@ def treat_all():
     spark = SparkSession.builder.appName("TreaterApplication").getOrCreate()
 
     # Call the treaters with the SparkSession
-    treat_cardealer(spark)
+   # treat_cardealer(spark)
     treat_client(spark)
-    treat_inmatriculation(spark)
-    treat_marketing(spark)
+   # treat_inmatriculation(spark)
+    #treat_marketing(spark)
 
     # Stop the SparkSession when you're done
     spark.stop()
