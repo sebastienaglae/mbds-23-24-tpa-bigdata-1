@@ -1,0 +1,16 @@
+{
+    "drivers": {
+        "HDFS": {
+            "url": "hdfs://135.181.84.87:9000"
+        }
+    },
+    "files": [
+        {
+            "path": "files/co2.csv",
+            "target": {
+                "type": "HDFS",
+                "path": "/data_wharehouse/co2.csv"
+            }
+        }
+    ]
+}
