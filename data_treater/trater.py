@@ -7,12 +7,13 @@ from marketing_treater import treat_marketing
 def treat_all():
     # Create a SparkSession
     spark = SparkSession.builder.appName("TreaterApplication").getOrCreate()
+    general_path = "/home/ernestobone/Documents/M2/TPA/OneDrive_1_15-11-2023/"
 
     # Call the treaters with the SparkSession
-   # treat_cardealer(spark)
-    treat_client(spark)
-   # treat_inmatriculation(spark)
-    #treat_marketing(spark)
+    treat_cardealer(spark, general_path + "M2_DMA_Catalogue/")
+    # treat_client(spark, general_path)
+    # treat_inmatriculation(spark, general_path)
+    treat_marketing(spark, general_path + "M2_DMA_Marketing/")
 
     # Stop the SparkSession when you're done
     spark.stop()

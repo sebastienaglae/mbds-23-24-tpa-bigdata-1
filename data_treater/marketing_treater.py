@@ -1,14 +1,20 @@
-from pyspark import SparkContext
+from pyspark.sql import SparkSession
 
-def treat_marketing(sc: SparkContext):
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import regexp_replace
+
+def treat_marketing(sc: SparkSession, general_path: str):
             
-    marketing = sc.textFile("/user/hduser/marketing.csv")
-    # Split each line of the csv files by the delimiter ";"
-    marketing = marketing.map(lambda line: line.split(";"))
+    marketing = sc.read.option("delimiter", ",").csv(general_path + "/Marketing.csv", header=True, encoding="UTF8")
 
-    # Remove the header of each csv file
-    marketing_header = marketing.first()
-    marketing = marketing.filter(lambda line: line != marketing_header)
+    marketing = marketing.na.drop()
 
-    # Create a RDD for each csv file
-    marketingRDD = marketing.map(lambda line: (line[0], line[1], line[2], line[3], line[4]))
+    marketing = marketing.withColumn("situationFamiliale", regexp_replace("situationFamiliale", r"C.libataire", "1"))
+    marketing = marketing.withColumn("situationFamiliale", regexp_replace("situationFamiliale", r"En Couple", "2"))
+
+    marketing = marketing.withColumn("2eme voiture", regexp_replace("2eme voiture", r"true", "1"))
+    marketing = marketing.withColumn("2eme voiture", regexp_replace("2eme voiture", r"false", "0"))
+    
+    marketing.write.csv(general_path + "/Marketing_treated", header=True, mode="overwrite")
+
+    marketing.show()
