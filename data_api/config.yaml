@@ -1,2 +1,4 @@
 sql:
   connectionString: postgres://postgres:AglaeSebastien@135.181.84.87:5432/mbds_bigdata?sslmode=disable
+web:
+  port: 8181

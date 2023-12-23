@@ -2,15 +2,22 @@ package svc
 
 import (
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
-type Web struct {
-	db *SqlDatabase
+type WebOptions struct {
+	Port int `mapstructure:"port"`
 }
 
-func NewWeb(db *SqlDatabase) (*Web, error) {
+type Web struct {
+	db   *SqlDatabase
+	port int
+}
+
+func NewWeb(db *SqlDatabase, opts *WebOptions) (*Web, error) {
 	return &Web{
-		db: db,
+		db:   db,
+		port: opts.Port,
 	}, nil
 }
 
@@ -26,6 +33,7 @@ func (web *Web) Start() error {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
 		}
+		defer rows.Close()
 
 		var result interface{}
 		if rows.Next() {
@@ -41,5 +49,9 @@ func (web *Web) Start() error {
 
 		c.JSON(200, result)
 	})
-	return r.Run()
+	// 404 handler
+	r.NoRoute(func(c *gin.Context) {
+		c.JSON(404, gin.H{"error": "not found"})
+	})
+	return r.Run(":" + strconv.Itoa(web.port))
 }
