@@ -2,6 +2,7 @@ from pyspark.sql import SparkSession
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import regexp_replace
+from sklearn.preprocessing import LabelEncoder
 
 def treat_cardealer(spark: SparkSession, general_path: str):
     # Read CSV into DataFrame
@@ -13,6 +14,16 @@ def treat_cardealer(spark: SparkSession, general_path: str):
 
     # replace "Hyunda*" (RE) by "Hyundai"
     cardealer = cardealer.withColumn("marque", regexp_replace("marque", r"Hyunda.", "Hyundai"))
+
+    # combine "marque" and "nom" into one column
+    cardealer = cardealer.withColumn("marque_nom", cardealer["marque"] + " " + cardealer["nom"])
+
+    # encode the column "marque_nom" into "marque_nom_encoded"
+    label_encoder = LabelEncoder()
+    cardealer = cardealer.withColumn("marque_nom_encoded", label_encoder.fit_transform(cardealer["marque_nom"]))
+    
+    # drop the columns "marque" and "nom"
+    cardealer = cardealer.drop("marque", "nom")
 
     # In the column "longueur" replace "courte" by "1", "moyenne" by "2", "longue" by "3" and "très lon
     cardealer = cardealer.withColumn("longueur", regexp_replace("longueur", r"courte", "1"))
@@ -30,9 +41,11 @@ def treat_cardealer(spark: SparkSession, general_path: str):
     # Convert the column "prix" to float
     cardealer = cardealer.withColumn("prix", cardealer["prix"].cast("float"))
 
+    
+
     # Save the DataFrame as csv
 
-    cardealer.write.csv(general_path + "cardealer_treated", 
+    cardealer.write.csv("/home/ernestobone/Documents/M2/TPA" + "cardealer_treated", 
                         header=True, mode="overwrite")
 
 

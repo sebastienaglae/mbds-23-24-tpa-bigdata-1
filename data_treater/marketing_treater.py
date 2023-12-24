@@ -14,7 +14,10 @@ def treat_marketing(sc: SparkSession, general_path: str):
 
     marketing = marketing.withColumn("2eme voiture", regexp_replace("2eme voiture", r"true", "1"))
     marketing = marketing.withColumn("2eme voiture", regexp_replace("2eme voiture", r"false", "0"))
+
+    marketing = marketing.withColumn("sexe", regexp_replace("sexe", r"F", "0"))
+    marketing = marketing.withColumn("sexe", regexp_replace("sexe", r"M", "1"))
     
-    marketing.write.csv(general_path + "/Marketing_treated", header=True, mode="overwrite")
+    marketing.write.csv("/home/ernestobone/Documents/M2/TPA" + "/Marketing_treated", header=True, mode="overwrite")
 
     marketing.show()
