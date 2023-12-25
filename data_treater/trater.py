@@ -13,7 +13,7 @@ def treat_all():
     os.environ['HADOOP_USER_NAME'] = 'root'
 
     # Specify the HDFS command you want to run
-    hdfs_command = "hdfs dfs -ls /"  # Replace with your desired HDFS command
+    hdfs_command = "hdfs dfs -ls hdfs://135.181.84.87:9000/"
 
     # Execute the command
     subprocess.run(hdfs_command, shell=True)
@@ -31,7 +31,6 @@ def treat_all():
     # treat_inmatriculation(spark, general_path)
     treat_marketing(spark, general_path)
 
-    # Stop the SparkSession when you're done
     spark.stop()
 
 if __name__ == "__main__":

@@ -1,1 +1,7 @@
 hdfs==latest
+skcit==latest
+sklearn==latest
+pandas==latest
+matplotlib==latest
+joblib==latest
+pyspark==latest
