@@ -3,8 +3,12 @@ from pyspark.sql.functions import col, when
 
 def treat_client(spark: SparkSession, general_path: str):
      # Lire le CSV dans un DataFrame
-    client = spark.read.option("delimiter", ";").csv(general_path + "/Clients_11.csv", header=True)
-
+    client_11 = spark.read.option("delimiter", ";").csv(general_path + "/Clients_11.csv", header=True)
+    client_19 = spark.read.option("delimiter", ";").csv(general_path + "/Clients_19.csv", header=True)
+    
+    # Concaténation des DataFrames Clients
+    client = client_11.union(client_19)
+    
     # Transformer les valeurs de la colonne "sexe"
     client = client.withColumn("gender", when(col("_c1").isin(["Homme", "H", "Masculin"]), "Homme").otherwise("Femme")
     ).select("_c0", "gender", "_c2", "_c3", "_c4", "_c5", "_c6")
