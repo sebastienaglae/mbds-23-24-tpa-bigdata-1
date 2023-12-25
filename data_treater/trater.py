@@ -27,8 +27,8 @@ def treat_all():
 
     # Call the treaters with the SparkSession
     treat_cardealer(spark, general_path)
-    # treat_client(spark, general_path)
-    # treat_inmatriculation(spark, general_path)
+    treat_client(spark, general_path)
+    treat_inmatriculation(spark, general_path)
     treat_marketing(spark, general_path)
 
     spark.stop()

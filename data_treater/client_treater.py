@@ -1,31 +1,37 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, when
+from pyspark.sql.functions import regexp_replace
 
 def treat_client(spark: SparkSession, general_path: str):
-     # Lire le CSV dans un DataFrame
-    client_11 = spark.read.option("delimiter", ";").csv(general_path + "/Clients_11.csv", header=True)
-    client_19 = spark.read.option("delimiter", ";").csv(general_path + "/Clients_19.csv", header=True)
-    
-    # Concaténation des DataFrames Clients
-    client = client_11.union(client_19)
-    
-    # Transformer les valeurs de la colonne "sexe"
-    client = client.withColumn("gender", when(col("_c1").isin(["Homme", "H", "Masculin"]), "Homme").otherwise("Femme")
-    ).select("_c0", "gender", "_c2", "_c3", "_c4", "_c5", "_c6")
 
-    # Effacer les lignes avec des éléments NaN dans toutes les colonnes du fichier client
+    # Lire le CSV dans un DataFrame
+    data11 = spark.read.option("delimiter", ",").csv(general_path + "/Clients_11.csv", header=True)
+    columns11 = ["age", "sexe", "taux", "situationFamiliale", "nbEnfantsAcharge", "2eme voiture", "immatriculation"]
+    client11 = spark.createDataFrame(data11.rdd, columns11)
+
+    data19 = spark.read.option("delimiter", ",").csv(general_path + "/Clients_19.csv", header=True)
+    columns19 = ["age", "sexe", "taux", "situationFamiliale", "nbEnfantsAcharge", "2eme voiture", "immatriculation"]
+    client19 = spark.createDataFrame(data19.rdd, columns19)
+
+    # Concaténer les deux DataFrames
+    client = client11.union(client19)
+
+    # compare client11 schema with client schema, if they are different, then print the schema
+    if client11.schema != client.schema:
+        print(client.schema)
+        print("Not the same schema")
+
     client = client.na.drop()
 
-    # Effacer les lignes ayant des caractères "?" dans toutes les colonnes du fichier client
-    client = client.filter(~col("_c0").contains("?") & ~col("gender").contains("?") & ~col("_c2").contains("?") & ~col("_c3").contains("?") & ~col("_c4").contains("?") & ~col("_c5").contains("?") & ~col("_c6").contains("?"))
+    client = client.withColumn("situationFamiliale", regexp_replace("situationFamiliale", r"C.libataire", "1"))
+    client = client.withColumn("situationFamiliale", regexp_replace("situationFamiliale", r"Seule", "1"))
+    client = client.withColumn("situationFamiliale", regexp_replace("situationFamiliale", r"En Couple", "2"))
 
-    # Remplacer les éléments "Seul" et "Seule" par "Celibataire" et "Marie(e)" par "En couple". On conserve uniquement "En couple" et "Célibataire"
-    client = client.withColumn(
-        "marital_status",
-        when(col("_c3").isin(["Célibataire"]), "Célibataire").otherwise("En couple")
-    ).select("_c0", "gender", "_c2", "marital_status", "_c4", "_c5", "_c6")
+    client = client.withColumn("2eme voiture", regexp_replace("2eme voiture", r"true", "1"))
+    client = client.withColumn("2eme voiture", regexp_replace("2eme voiture", r"false", "0"))
 
-    # Afficher le client résultant
+    client = client.withColumn("sexe", regexp_replace("sexe", r"F", "0"))
+    client = client.withColumn("sexe", regexp_replace("sexe", r"M", "1"))
+
     client.show()
 
 
