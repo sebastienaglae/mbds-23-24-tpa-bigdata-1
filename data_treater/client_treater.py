@@ -1,9 +1,9 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, when
 
-def treat_client(spark: SparkSession):
+def treat_client(spark: SparkSession, general_path: str):
      # Lire le CSV dans un DataFrame
-    client = spark.read.option("delimiter", ";").csv("C:/Users/vince/Documents/Cours_MBDS/Projet_TPA/TPA_BIGDATA/TPA_BIGDATA/Groupe_TPA_2/M2_DMA_Clients_12/Clients_11.csv", header=True)
+    client = spark.read.option("delimiter", ";").csv(general_path + "/Clients_11.csv", header=True)
 
     # Transformer les valeurs de la colonne "sexe"
     client = client.withColumn("gender", when(col("_c1").isin(["Homme", "H", "Masculin"]), "Homme").otherwise("Femme")

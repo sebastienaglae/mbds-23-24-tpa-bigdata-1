@@ -2,9 +2,9 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, when
 from sklearn.preprocessing import LabelEncoder
 
-def treat_inmatriculation(spark: SparkSession):
+def treat_inmatriculation(spark: SparkSession, general_path: str):
     # Lire le CSV dans un DataFrame
-    immatriculation = spark.read.option("delimiter", ";").csv("C:/Users/vince/Documents/Cours_MBDS/Projet_TPA/TPA_BIGDATA/TPA_BIGDATA/Groupe_TPA_2/M2_DMA_Immatriculations/Immatriculations.csv", header=True)
+    immatriculation = spark.read.option("delimiter", ";").csv(general_path + "/Immatriculations.csv", header=True)
 
     # Supprimer les lignes avec des valeurs nulles
     immatriculation = immatriculation.na.drop()
