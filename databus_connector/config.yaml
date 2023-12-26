@@ -1,0 +1,12 @@
+sql:
+  connectionString: postgres://root:@localhost:26257/mbds_bigdata?sslmode=disable
+nats:
+  url: nats://135.181.84.87:4222
+connector:
+  event:
+    stream: DATASOURCE
+    consumer:
+      new: NEW
+      update: UPDATE
+      delete: DELETE
+  database: mbds_bigdata
