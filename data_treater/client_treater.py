@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import regexp_replace
+import os
 
 def treat_client(spark: SparkSession, general_path: str):
 
@@ -31,6 +32,12 @@ def treat_client(spark: SparkSession, general_path: str):
 
     client = client.withColumn("sexe", regexp_replace("sexe", r"F", "0"))
     client = client.withColumn("sexe", regexp_replace("sexe", r"M", "1"))
+
+    # output_directory = "/home/ernestobone/Documents/M2/TPA/TEST/" + "client_treated"
+    # os.makedirs(output_directory, exist_ok=True)
+    # client.write.csv(output_directory, header=True, mode="overwrite")
+
+    # Send the DF to the DB here
 
     client.show()
 

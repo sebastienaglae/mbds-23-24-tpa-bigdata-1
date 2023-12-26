@@ -23,6 +23,6 @@ def treat_marketing(sc: SparkSession, general_path: str):
     # os.makedirs(output_directory, exist_ok=True)
     # marketing.write.csv(output_directory, header=True, mode="overwrite")
 
-    # Saving process here
+    # Send the DF to the DB here
 
     marketing.show()

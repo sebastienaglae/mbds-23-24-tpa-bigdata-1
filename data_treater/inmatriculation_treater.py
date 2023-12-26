@@ -3,6 +3,7 @@ from pyspark.sql.functions import col
 from pyspark.sql.functions import regexp_replace, concat_ws
 from pyspark.ml.feature import StringIndexer
 from pyspark.ml import Pipeline
+import os
 
 
 def treat_inmatriculation(spark: SparkSession, general_path: str):
@@ -59,7 +60,11 @@ def treat_inmatriculation(spark: SparkSession, general_path: str):
     immatriculation = immatriculation.withColumn("prix", immatriculation["prix"].cast("float"))
 
     # Save the DataFrame as csv
-    # immatriculation.write.csv(general_path + "/immatriculation_treated", header=True, mode="overwrite")
+    # output_directory = "/home/ernestobone/Documents/M2/TPA/TEST/" + "imm_treated"
+    # os.makedirs(output_directory, exist_ok=True)
+    # immatriculation.write.csv(output_directory, header=True, mode="overwrite")
+
+    # Send the DF to the DB here
     
     immatriculation.show()
 

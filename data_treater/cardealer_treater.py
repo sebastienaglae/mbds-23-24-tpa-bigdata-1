@@ -58,11 +58,11 @@ def treat_cardealer(spark: SparkSession, general_path: str):
     cardealer = cardealer.withColumn("prix", cardealer["prix"].cast("float"))
 
     # Save the DataFrame as csv
-    # output_directory = "/home/ernestobone/Documents/M2/TPA/" + "cardealer_treated"
+    # output_directory = "/home/ernestobone/Documents/M2/TPA/TEST/" + "cardealer_treated"
     # os.makedirs(output_directory, exist_ok=True)
     # cardealer.write.csv(output_directory, header=True, mode="overwrite")
 
-    # Saving process here
+    # Send the DF to the DB here
 
     # To show the resulting DataFrame
     cardealer.show()
