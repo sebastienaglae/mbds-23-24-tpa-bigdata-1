@@ -13,25 +13,21 @@ async def treat_co2(spark: SparkSession, general_path: str, databus: Databus):
     # Drop the first column, which is useless
     co2 = co2.drop("_c0")
 
-    # For the column 'Bonus / Malus' remove every character after the € sign (keep all the characters before the € sign)
-    co2 = co2.withColumn("Bonus / Malus", regexp_replace("Bonus / Malus", r"€.*", "")) 
-    co2 = co2.withColumn("Bonus / Malus", regexp_replace("Bonus / Malus", r"€", "")) 
-    co2 = co2.withColumn("Bonus / Malus", regexp_replace("Bonus / Malus", r"^-$", "0"))
-    co2 = co2.withColumn("Bonus / Malus", regexp_replace("Bonus / Malus", r"\xc2", ""))
-    co2 = co2.withColumn("Bonus / Malus", regexp_replace("Bonus / Malus", r"\xa0", ""))
-    co2 = co2.withColumn("Bonus / Malus", regexp_replace("Bonus / Malus", r"\x20", ""))
-
-    # For the column 'Cout enerie' replace the header 'Cout enerie' by 'Cout energie'
     co2 = co2.withColumnRenamed("Cout enerie", "Cout energie")
 
-    #for the column 'Cout energie' remove every character after the € sign (keep all the characters before the € sign)
-    co2 = co2.withColumn("Cout energie", regexp_replace("Cout energie", r"€.*", ""))
-    co2 = co2.withColumn("Cout energie", regexp_replace("Cout energie", r"€", ""))
-    co2 = co2.withColumn("Cout energie", regexp_replace("Cout energie", r"^-$", "0"))
-    co2 = co2.withColumn("Cout energie", regexp_replace("Cout energie", r"\xc2", ""))
-    co2 = co2.withColumn("Cout energie", regexp_replace("Cout energie", r"\xa0", ""))
-    co2 = co2.withColumn("Cout energie", regexp_replace("Cout energie", r" ", ""))
-
+    # For the column 'Bonus / Malus' remove every character after the € sign (keep all the characters before the € sign)
+    replace_map = {
+        r"€.*": "",
+        r"€": "",
+        r"^-$": "0",
+        r"\xc2": "",
+        r"\xa0": "",
+        r"\x20": "",
+    }
+    for key, value in replace_map.items():
+        co2 = co2.withColumn("Bonus / Malus", regexp_replace("Bonus / Malus", key, value))
+        co2 = co2.withColumn("Cout energie", regexp_replace("Cout energie", key, value))
+        
     # Create a new column 'Marque' from 'Marque / Modele' keeping everything before the space
     co2 = co2.withColumn("Marque", regexp_replace("Marque / Modele", r" .*", ""))
 
