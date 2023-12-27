@@ -23,16 +23,20 @@ async def treat_co2(spark: SparkSession, general_path: str, databus: Databus):
         r"\xc2": "",
         r"\xa0": "",
         r"\x20": "",
+        r" ": "",
+        r"\"": "",
     }
     for key, value in replace_map.items():
         co2 = co2.withColumn("Bonus / Malus", regexp_replace("Bonus / Malus", key, value))
         co2 = co2.withColumn("Cout energie", regexp_replace("Cout energie", key, value))
-        
+
     # Create a new column 'Marque' from 'Marque / Modele' keeping everything before the space
     co2 = co2.withColumn("Marque", regexp_replace("Marque / Modele", r" .*", ""))
+    co2 = co2.withColumn("Marque", regexp_replace("Marque", r"\"", ""))
 
     # For the column 'Marque / Modele' keep the match of the group 1 from this regex [A-Z]+\s(.+) (keep everything after the space)
     co2 = co2.withColumn("Modele", regexp_replace("Marque / Modele", r"[A-Z]+\s(.+)", "$1"))
+    co2 = co2.withColumn("Modele", regexp_replace("Modele", r"\"", ""))
 
     # Remove the comlumn 'Marque / Modele'
     co2 = co2.drop("Marque / Modele")
