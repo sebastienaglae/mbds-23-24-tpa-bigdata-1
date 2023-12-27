@@ -3,6 +3,7 @@ from cardealer_treater import treat_cardealer
 from client_treater import treat_client
 from inmatriculation_treater import treat_inmatriculation
 from marketing_treater import treat_marketing
+from co2_treater import treat_co2
 import os
 import subprocess
 
@@ -30,6 +31,7 @@ def treat_all():
     treat_client(spark, general_path)
     treat_inmatriculation(spark, general_path)
     treat_marketing(spark, general_path)
+    treat_co2(spark, general_path)
 
     spark.stop()
 
