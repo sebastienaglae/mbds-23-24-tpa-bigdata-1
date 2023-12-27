@@ -1,0 +1,14 @@
+nats:
+  host: "135.181.84.87"
+  max_concurrent: 5000
+  pub_subject: "DATASOURCE.<mode>" # can be <table>.<mode> to separate by table
+  mode_subject_map:
+    insert: "INSERT"
+    update: "UPDATE"
+    upsert: "UPSERT"
+    delete: "DELETE"
+  enable_smart_upsert: true # if true, row will be pushed to NATS only if it has changed
+  sqlite_db_path: "db.sqlite3"
+spark:
+  hdfspath: "hdfs://135.181.84.87:9000"
+  hdfsuser: "root"
