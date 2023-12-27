@@ -62,9 +62,9 @@ async def treat_all(config):
     databus = Databus(config["nats"])
     await databus.connect()
 
-    await spark_treat_all(config, databus)
     await mongodb_treat_all(config, databus)
     await redis_treat_all(config, databus)
+    await spark_treat_all(config, databus)
 
 if __name__ == "__main__":
     with open("config.yaml", "r") as f:
@@ -72,4 +72,3 @@ if __name__ == "__main__":
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(treat_all(config))
-    loop.close()
