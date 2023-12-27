@@ -92,6 +92,6 @@ async def treat_cardealer(spark: SparkSession, general_path: str, databus: Datab
             "price": data["prix"],
         }
     
-    await databus.publish_result("catalog_car", cardealer.collect(), ["brand", "name", "power", "length", "seating_capacity", "number_doors", "color", "used"], transform_data, mode="upsert")
+    await databus.publish_result("catalog_car", [row.asDict() for row in cardealer.collect()], ["brand", "name", "power", "length", "seating_capacity", "number_doors", "color", "used"], transform_data, mode="upsert")
     
     cardealer.show()

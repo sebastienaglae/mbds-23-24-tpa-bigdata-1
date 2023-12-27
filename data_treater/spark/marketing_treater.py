@@ -48,6 +48,6 @@ async def treat_marketing(sc: SparkSession, general_path: str, databus: Databus)
             "has_second_car": data["2eme voiture"]
         }
     
-    await databus.publish_result("customer_marketing", marketing.collect(), ["age", "gender", "debt_rate", "marital_status", "dependent_children", "has_second_car"], transform_data, mode="upsert")
+    await databus.publish_result("customer_marketing", [row.asDict() for row in marketing.collect()], ["age", "gender", "debt_rate", "marital_status", "dependent_children", "has_second_car"], transform_data, mode="upsert")
 
     marketing.show()

@@ -53,6 +53,6 @@ async def treat_co2(spark: SparkSession, general_path: str, databus: Databus):
             "energy_cost": data["Cout energie"],
         }
     
-    await databus.publish_result("brand_co2_emissions", co2.collect(), ["brand", "car_name"], transform_data, mode="upsert")
+    await databus.publish_result("brand_co2_emissions", [row.asDict() for row in co2.collect()], ["brand", "car_name"], transform_data, mode="upsert")
 
     co2.show()
