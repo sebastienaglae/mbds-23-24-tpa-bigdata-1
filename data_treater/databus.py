@@ -33,8 +33,7 @@ class Databus:
         pk_attrs_str = pk_attrs if isinstance(pk_attrs, str) else ",".join(pk_attrs)
         pub_subject = self.pub_subject.replace("<type>", collection_name).replace("<mode>", mode)
         running_tasks = []
-        for data in collected_data:
-            row_data = data.asDict()
+        for row_data in collected_data:
             transformed_data = transformer(row_data)
             json_data = json.dumps(transformed_data)
             json_data_bytes = bytes(json_data, "utf-8")

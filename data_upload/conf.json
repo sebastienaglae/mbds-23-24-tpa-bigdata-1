@@ -2,49 +2,20 @@
     "drivers": {
         "HDFS": {
             "url": "hdfs://135.181.84.87:9000"
+        },
+        "Redis": {
+            "host": "135.181.84.87",
+            "port": 6379,
+            "password": "",
+            "db": 0
         }
     },
     "files": [
         {
-            "path": "files/CO2.csv",
-            "target": {
-                "type": "HDFS",
-                "path": "/data_wharehouse/CO2.csv"
-            }
-        },
-        {
-            "path": "files/Clients_11.csv",
-            "target": {
-                "type": "HDFS",
-                "path": "/data_wharehouse/Clients_11.csv"
-            }
-        },
-        {
-            "path": "files/Clients_19.csv",
-            "target": {
-                "type": "HDFS",
-                "path": "/data_wharehouse/Clients_19.csv"
-            }
-        },
-        {
-            "path": "files/Immatriculations.csv",
-            "target": {
-                "type": "HDFS",
-                "path": "/data_wharehouse/Immatriculations.csv"
-            }
-        },
-        {
             "path": "files/Marketing.csv",
             "target": {
-                "type": "HDFS",
-                "path": "/data_wharehouse/Marketing.csv"
-            }
-        },
-        {
-            "path": "files/Catalogue.csv",
-            "target": {
-                "type": "HDFS",
-                "path": "/data_wharehouse/Catalogue.csv"
+                "type": "Redis",
+                "key": "Marketing"
             }
         }
     ]

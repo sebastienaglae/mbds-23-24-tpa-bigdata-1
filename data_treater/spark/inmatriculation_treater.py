@@ -86,7 +86,7 @@ async def treat_inmatriculation(spark: SparkSession, general_path: str, databus:
                 "allowUpdate": True,
             }
         }
-    await databus.publish_result("customer_car_registration", immatriculation.collect(), "registration_id", transform_data)
+    await databus.publish_result("customer_car_registration", [row.asDict() for row in immatriculation.collect()], "registration_id", transform_data)
 
     print("Immatriculation treated")
     # immatriculation.show()

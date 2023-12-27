@@ -12,3 +12,12 @@ nats:
 spark:
   hdfspath: "hdfs://135.181.84.87:9000"
   hdfsuser: "root"
+mongo:
+  connection_string: "mongodb://root:AglaeSebastien@135.181.84.87:27017"
+  database: "bigdata"
+redis:
+  host: "135.181.84.87"
+  port: 6379
+  password: ""
+  db: 0
+  

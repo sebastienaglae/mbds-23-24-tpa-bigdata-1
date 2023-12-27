@@ -86,7 +86,7 @@ async def treat_client(spark: SparkSession, general_path: str, databus: Databus)
             "current_registration_id": data["immatriculation"].upper(),
         }
     
-    await databus.publish_result("customer", client.collect(), ["age", "gender", "debt_rate", "marital_status", "dependent_children", "has_second_car"], transform_data, mode="upsert")
+    await databus.publish_result("customer", [row.asDict() for row in client.collect()], ["age", "gender", "debt_rate", "marital_status", "dependent_children", "has_second_car"], transform_data, mode="upsert")
 
     # Send the DF to the DB here
 
