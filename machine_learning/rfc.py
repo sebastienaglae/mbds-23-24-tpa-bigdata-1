@@ -6,22 +6,26 @@ import customers_treater as ct
 import joblib
 from sklearn.metrics import f1_score
 
-
+print("---------- Getting the data ----------")
 customers = ct.treat_customers()
+print("---------- Data retrieved ----------")
 
 # Features and target
 X =  customers.drop("car_brand_name_encoded", axis=1)  # Features
 y = customers["car_brand_name_encoded"]  # Target
 
+print("---------- Splitting the data ----------")
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Create a RandomForestClassifier
 rf_classifier = RandomForestClassifier(n_estimators=100, random_state=42)
 
+print("---------- Training the model ----------")
 # Train the model
 rf_classifier.fit(X_train, y_train)
 
+print("---------- Saving the model ----------")
 # Save the trained model using joblib
 joblib.dump(rf_classifier, 'random_forest_model.joblib')
 

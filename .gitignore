@@ -6,3 +6,4 @@ random_forest_model.joblib
 neural_network_model.joblib
 mean_shift_model.joblib
 bayesian_gmm_model.joblib
+brand_encoder.joblib
