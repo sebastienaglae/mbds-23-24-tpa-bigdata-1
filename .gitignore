@@ -1,2 +1,6 @@
 __pycache__/
 /data_upload/files/
+random_forest_model.joblib
+neural_network_model.joblib
+mean_shift_model.joblib
+bayesian_gmm_model.joblib

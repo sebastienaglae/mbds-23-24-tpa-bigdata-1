@@ -1,20 +1,17 @@
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
-from get_data import get_data
 import joblib
+import customers_treater as ct
 
 # Call the function to retrieve data
-_, _, client_df, immatriculation_df = get_data()
-
-# Merge client_df and inmatriculation_df with the key inmatriculation
-merged_df = pd.merge(client_df, immatriculation_df, on="inmatriculation")
+customers = ct.treat_customers()
 
 # Features and target
-X = merged_df.drop("marque_nom_encoded", axis=1)  # Features
-y = merged_df["marque_nom_encoded"]  # Target
+X = customers.drop("car_brand_name_encoded", axis=1)  # Features
+y = customers["car_brand_name_encoded"]  # Target
 
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -39,3 +36,6 @@ y_pred = mlp_classifier.predict(X_test_scaled)
 # Evaluate the model
 accuracy = accuracy_score(y_test, y_pred)
 print(f"Accuracy: {accuracy}")
+
+# Show the classification report
+print(classification_report(y_test, y_pred))
