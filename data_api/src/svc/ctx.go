@@ -2,6 +2,7 @@ package svc
 
 type Options struct {
 	Sql SqlOptions `mapstructure:"sql"`
+	Web WebOptions `mapstructure:"web"`
 }
 
 type Context struct {
@@ -15,7 +16,7 @@ func NewContext(opts *Options) (*Context, error) {
 	if ctx.SqlDatabase, err = NewSql(&opts.Sql); err != nil {
 		return nil, err
 	}
-	if ctx.Web, err = NewWeb(ctx.SqlDatabase); err != nil {
+	if ctx.Web, err = NewWeb(ctx.SqlDatabase, &opts.Web); err != nil {
 		return nil, err
 	}
 	return &ctx, nil

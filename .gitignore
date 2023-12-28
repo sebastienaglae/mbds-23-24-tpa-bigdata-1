@@ -1,5 +1,7 @@
 __pycache__/
 /data_upload/files/
+.DS_Store
+
 random_forest_model.joblib
 neural_network_model.joblib
 mean_shift_model.joblib

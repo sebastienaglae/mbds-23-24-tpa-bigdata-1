@@ -1,10 +1,11 @@
 package svc
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/nats-io/nats.go/jetstream"
+	"strconv"
 	"strings"
 )
 
@@ -59,12 +60,14 @@ func (s *Connector) Stop() {
 	}
 }
 
-func (s *Connector) GetHandler(handlerType string) func(msg jetstream.Msg) error {
+func (s *Connector) GetHandler(handlerType string) func(msg jetstream.Msg, cb func(err error)) error {
 	switch handlerType {
 	case "new":
 		return s.onNew
 	case "update":
 		return s.onUpdate
+	case "upsert":
+		return s.onUpsert
 	case "delete":
 		return s.onDelete
 	default:
@@ -72,102 +75,111 @@ func (s *Connector) GetHandler(handlerType string) func(msg jetstream.Msg) error
 	}
 }
 
-func (s *Connector) onNew(msg jetstream.Msg) error {
-	tableName, dataKey, dataValue, err := parseMessageData(msg)
+func (s *Connector) onNew(msg jetstream.Msg, cb func(err error)) error {
+	return errors.New("not implemented")
+}
+
+func (s *Connector) onUpdate(msg jetstream.Msg, cb func(err error)) error {
+	return errors.New("not implemented")
+}
+
+func (s *Connector) onUpsert(msg jetstream.Msg, cb func(err error)) error {
+	tableName, tablePks, attrs, err := parseMessageData(msg)
 	if err != nil {
 		return err
 	}
-	sb := strings.Builder{}
-	sb.WriteString("INSERT INTO `")
-	sb.WriteString(tableName)
-	sb.WriteString("` (")
-	for _, k := range dataKey {
-		sb.WriteString("`")
-		sb.WriteString(k)
-		sb.WriteString("`,")
-	}
-	sb.WriteString(") VALUES (")
-	for i := 0; i < len(dataValue); i++ {
-		if i > 0 {
-			sb.WriteByte(',')
+
+	args := make([]interface{}, 0)
+	reqStr := prepareInsertRequest(tableName, tablePks, attrs, true, "", &args)
+
+	// log.Debug().Str("table", tableName).Str("pk", strings.Join(tablePks, ",")).Str("query", reqStr).Msg("upsert")
+	s.db.Queue(reqStr, args, cb)
+	return nil
+}
+
+func (s *Connector) onDelete(msg jetstream.Msg, cb func(err error)) error {
+	return errors.New("not implemented")
+}
+
+func prepareInsertRequest(tableName string, tablePks []string, attrs map[string]interface{}, upsert bool, returnPk string, args *[]interface{}) string {
+	subRequests := make([]string, 0)
+	columns := make([]string, 0)
+	values := make([]string, 0)
+	updates := make([]string, 0)
+
+	for k, v := range attrs {
+		columns = append(columns, k)
+		// if value is not a map, then it's a primitive type
+		if valueInterface, ok := v.(map[string]interface{}); !ok {
+			*args = append(*args, v)
+			values = append(values, "$"+strconv.Itoa(len(*args)))
+			updates = append(updates, k+"=$"+strconv.Itoa(len(*args)))
+		} else {
+			fromTable := valueInterface["from"].(string)
+			fromTablePks := strings.Split(valueInterface["pk"].(string), ",")
+			fromTableRef := valueInterface["ref"].(string)
+			fromTableAttributes := valueInterface["match"].(map[string]interface{})
+			allowUpdate := valueInterface["allowUpdate"].(bool)
+
+			subRequests = append(subRequests, prepareInsertRequest(fromTable, fromTablePks, fromTableAttributes, allowUpdate, fromTableRef, args))
+			if len(subRequests) > 1 {
+				panic("multiple sub requests not supported")
+			}
+			values = append(values, fromTableRef)
 		}
-		sb.WriteString("?")
 	}
-	sb.WriteByte(')')
 
-	_, err = s.db.Exec(context.Background(), sb.String(), dataValue...)
-	if err != nil {
-		return err
+	var reqStr string
+	if len(subRequests) > 0 {
+		reqStr = "WITH ins AS (" + subRequests[0] + ") INSERT INTO %s (%s) SELECT %s FROM ins"
+	} else {
+		reqStr = "INSERT INTO %s (%s) VALUES (%s)"
 	}
-	return nil
-}
 
-func (s *Connector) onUpdate(msg jetstream.Msg) error {
-	tableName, dataKey, dataValue, err := parseMessageData(msg)
-	if err != nil {
-		return err
-	}
-	rowId := msg.Headers().Get("rowId")
-	if rowId == "" {
-		return errors.New("rowId not found")
-	}
-	sb := strings.Builder{}
-	sb.WriteString("UPDATE `")
-	sb.WriteString(tableName)
-	sb.WriteString("` SET ")
-	for i, k := range dataKey {
-		if i > 0 {
-			sb.WriteByte(',')
+	reqStr = fmt.Sprintf(reqStr,
+		tableName,
+		strings.Join(columns, ","),
+		strings.Join(values, ","))
+
+	if upsert {
+		reqStr += " ON CONFLICT (%s) DO UPDATE SET %s"
+		reqStr = fmt.Sprintf(reqStr,
+			strings.Join(tablePks, ","),
+			strings.Join(updates, ","))
+
+		if returnPk != "" {
+			reqStr += " RETURNING " + returnPk
 		}
-		sb.WriteString("`")
-		sb.WriteString(k)
-		sb.WriteString("`=?")
+	} else if returnPk != "" {
+		dummyUpdates := make([]string, len(tablePks))
+		for i := range dummyUpdates {
+			dummyUpdates[i] = tablePks[i] + "=excluded." + tablePks[i]
+		}
+		reqStr += " ON CONFLICT (%s) DO UPDATE SET %s RETURNING %s"
+		reqStr = fmt.Sprintf(reqStr,
+			strings.Join(tablePks, ","),
+			strings.Join(dummyUpdates, ","))
+	} else {
+		reqStr += " ON CONFLICT (%s) DO NOTHING"
+		reqStr = fmt.Sprintf(reqStr,
+			strings.Join(tablePks, ","))
 	}
-	sb.WriteString(" WHERE `id`=?")
 
-	dataValue = append(dataValue, rowId)
-	_, err = s.db.Exec(context.Background(), sb.String(), dataValue)
-	if err != nil {
-		return err
-	}
-	return nil
+	return reqStr
 }
 
-func (s *Connector) onDelete(msg jetstream.Msg) error {
-	tableName, _, _, err := parseMessageData(msg)
-	if err != nil {
-		return err
-	}
-	rowId := msg.Headers().Get("rowId")
-	if rowId == "" {
-		return errors.New("rowId not found")
-	}
-	sb := strings.Builder{}
-	sb.WriteString("DELETE FROM `")
-	sb.WriteString(tableName)
-	sb.WriteString("` WHERE `id`=?")
-
-	_, err = s.db.Exec(context.Background(), sb.String(), rowId)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func parseMessageData(msg jetstream.Msg) (string, []string, []interface{}, error) {
+func parseMessageData(msg jetstream.Msg) (string, []string, map[string]interface{}, error) {
 	var data map[string]interface{}
 	if err := json.Unmarshal(msg.Data(), &data); err != nil {
 		return "", nil, nil, err
-	}
-	var dataKeys []string
-	var dataValues []interface{}
-	for k, v := range data {
-		dataKeys = append(dataKeys, k)
-		dataValues = append(dataValues, v)
 	}
 	tableName := msg.Headers().Get("table")
 	if tableName == "" {
 		return "", nil, nil, errors.New("table name not found")
 	}
-	return tableName, dataKeys, dataValues, nil
+	tablePk := msg.Headers().Get("tablePk")
+	if tablePk == "" {
+		return "", nil, nil, errors.New("table primary key not found")
+	}
+	return tableName, strings.Split(tablePk, ","), data, nil
 }

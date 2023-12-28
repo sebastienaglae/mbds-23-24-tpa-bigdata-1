@@ -1,0 +1,5 @@
+nats_py==2.6.0
+pymongo==4.6.1
+pyspark==3.5.0
+PyYAML==6.0.1
+redis==5.0.1
