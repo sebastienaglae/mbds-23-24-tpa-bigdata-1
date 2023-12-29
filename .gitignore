@@ -9,3 +9,5 @@ bayesian_gmm_model.joblib
 brand_encoder.joblib
 treated_customers.csv
 predictions.csv
+stacking_classifier_model.joblib
+random_forest_model_tuned.joblib
