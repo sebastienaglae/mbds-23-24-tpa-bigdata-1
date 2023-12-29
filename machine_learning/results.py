@@ -23,3 +23,7 @@ marketing["prediction"] = encoder.inverse_transform(marketing["prediction"])
 
 # Display the first 5 rows of the DataFrame
 print(marketing.head())
+
+# Save marketing DataFrame to a CSV file called "predictions.csv"
+print("---------- Saving Predictions ----------")
+marketing.to_csv("predictions.csv", index=False)

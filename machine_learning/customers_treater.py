@@ -39,5 +39,8 @@ def treat_customers():
     # Drop "customer_id" column
     customers.drop("customer_id", axis=1, inplace=True)
 
+    # save the treated data
+    customers.to_csv("treated_customers.csv", index=False)
+
     return customers
 
