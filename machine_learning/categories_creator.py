@@ -36,13 +36,14 @@ print(cluster_distribution)
 # Remove the encoded columns
 cars.drop(['brand_encoded', 'color_encoded', 'name_encoded', 'length_encoded', 'used_encoded'], axis=1, inplace=True)
 
-def transform_data(row):
+def transform_data(row_tuple):
+    _, row = row_tuple
     return {
         "id": row["id"],
         "category_id": row["category_id"]
     }
 
-databus_publish_task = databus.publish_result("cars", cars, "id", transform_data, mode="upsert")
+databus_publish_task = databus.publish_result("catalog_car", cars.iterrows(), "id", transform_data, mode="update")
 loop.run_until_complete(databus_publish_task)
 
 
