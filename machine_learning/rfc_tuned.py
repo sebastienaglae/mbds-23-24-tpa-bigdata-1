@@ -26,14 +26,12 @@ def load_and_preprocess_data(prediction_type: str = "carmodel"):
     print("---------- Data retrieved ----------")
     
     if prediction_type == "carmodel":
-        y_column = "car_brand_name_encoded"
+        X = customers.drop(["car_brand_name_encoded", "car_category_id"], axis=1)
+        y = customers["car_brand_name_encoded"]
     elif prediction_type == "category":
-        y_column = "category_id"
-    else:
-        raise ValueError("Invalid prediction type. Supported types: 'carmodel' or 'category'.")
-
-    X = customers.drop(y_column, axis=1)  # Features
-    y = customers[y_column]  # Target
+        X = customers.drop(["car_category_id", "car_brand_name_encoded"], axis=1)
+        y = customers["car_category_id"]
+        
     return X, y
 
 def split_data(X, y, test_size=0.2, random_state=42):

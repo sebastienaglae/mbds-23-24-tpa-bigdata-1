@@ -25,13 +25,13 @@ def treat_customers():
     customers["car_brand_name"] = customers["car_brand_name"].str.replace(' ', '_')
 
     # Encode the "car_brand_name" column using Label Encoding
-    brand_encoder = LabelEncoder()
-    customers["car_brand_name_encoded"] = brand_encoder.fit_transform(customers["car_brand_name"])
+    # brand_encoder = LabelEncoder()
+    # customers["car_brand_name_encoded"] = brand_encoder.fit_transform(customers["car_brand_name"])
 
     # Drop all the columns starting with "car_" except "car_brand_name_encoded"
-    customers.drop(customers.filter(regex='^car_').columns.difference(['car_brand_name_encoded', 'car_category_id']), axis=1, inplace=True)
+    customers.drop(customers.filter(regex='^car_').columns.difference(['car_category_id', 'car_id']), axis=1, inplace=True)
 
-    joblib.dump(brand_encoder, 'brand_encoder.joblib')
+    # joblib.dump(brand_encoder, 'brand_encoder.joblib')
 
     # Drop null values
     customers.dropna(inplace=True)

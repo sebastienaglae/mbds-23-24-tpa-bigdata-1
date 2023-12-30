@@ -1,10 +1,11 @@
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, mean_squared_error
 import customers_treater as ct
 import joblib
 import os
 import pandas as pd
+import numpy as np
 
 def load_and_preprocess_data(prediction_type: str = "carmodel"):
     """
@@ -30,10 +31,10 @@ def load_and_preprocess_data(prediction_type: str = "carmodel"):
     print("---------- Data fetched ----------")
     
     if prediction_type == "carmodel":
-        X = customers.drop(["car_brand_name_encoded", "car_category_id"], axis=1)
-        y = customers["car_brand_name_encoded"]
+        X = customers.drop(["car_id", "car_category_id"], axis=1)
+        y = customers["car_id"]
     elif prediction_type == "category":
-        X = customers.drop(["car_category_id", "car_brand_name_encoded"], axis=1)
+        X = customers.drop(["car_category_id", "car_id"], axis=1)
         y = customers["car_category_id"]
     
     return X, y
@@ -51,7 +52,7 @@ def train_and_save_model(X_train, y_train, prediction_type: str = "carmodel"):
     - RandomForestClassifier: Trained model.
     """
     print(f"---------- Training the RandomForestClassifier for {prediction_type} ----------")
-    rf_classifier = RandomForestClassifier(n_estimators=100, random_state=42)
+    rf_classifier = RandomForestRegressor(n_estimators=100, random_state=42)
     rf_classifier.fit(X_train, y_train)
     
     # Save the model
@@ -77,8 +78,28 @@ def evaluate_model(model, X_test, y_test):
     print("Classification Report:")
     print(classification_report(y_test, y_pred))
 
+def evaluate_regression_model(model, X_test, y_test):
+    print("---------- Evaluating the Regression model ----------")
+    y_pred = model.predict(X_test)
+    mse = mean_squared_error(y_test, y_pred)
+    rmse = np.sqrt(mse)
+    r_squared = model.score(X_test, y_test)
+
+    print(f"Mean Squared Error (MSE): {mse}")
+    print(f"Root Mean Squared Error (RMSE): {rmse}")
+    print(f"R-squared: {r_squared}")
+
 if __name__ == "__main__":
-    X, y = load_and_preprocess_data("category")
+    prediction_type = "carmodel"
+    X, y = load_and_preprocess_data(prediction_type)
+    print(f"X shape: {X.shape}")
+    print(f"y shape: {y.shape}")
+    print(f"X head:\n{X.head()}")
+    print(f"y head:\n{y.head()}")
+    # print y data type
+    print(f"y data type: {y.dtype}")
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    rf_model = train_and_save_model(X_train, y_train, prediction_type="category")
-    evaluate_model(rf_model, X_test, y_test)
+    # rf_model = train_and_save_model(X_train, y_train, prediction_type=prediction_type)
+    # evaluate_model(rf_model, X_test, y_test)
+    rf_regressor = train_and_save_model(X_train, y_train, prediction_type)
+    evaluate_regression_model(rf_regressor, X_test, y_test)

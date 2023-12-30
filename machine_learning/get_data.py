@@ -5,7 +5,7 @@ end_points = ["cars", "customer_marketing", "customers", "customer_car_registrat
 ip_port = "http://135.181.84.87:8181/"
 
 # Function to retrieve data from a paginated endpoint
-def get_paginated_data(endpoint, page_size=100):
+def get_paginated_data(endpoint, page_size=1000000):
     page = 1
     all_data = []
 
