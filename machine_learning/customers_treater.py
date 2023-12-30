@@ -29,7 +29,7 @@ def treat_customers():
     customers["car_brand_name_encoded"] = brand_encoder.fit_transform(customers["car_brand_name"])
 
     # Drop all the columns starting with "car_" except "car_brand_name_encoded"
-    customers.drop(customers.filter(regex='^car_').columns.difference(['car_brand_name_encoded']), axis=1, inplace=True)
+    customers.drop(customers.filter(regex='^car_').columns.difference(['car_brand_name_encoded', 'car_category_id']), axis=1, inplace=True)
 
     joblib.dump(brand_encoder, 'brand_encoder.joblib')
 
@@ -44,3 +44,5 @@ def treat_customers():
 
     return customers
 
+if __name__ == "__main__":
+    treat_customers()
