@@ -1,5 +1,16 @@
 from sklearn.cluster import KMeans
 import cars_treater as ct
+from databus import Databus
+import yaml
+import asyncio
+
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+databus = Databus(config["nats"])
+databus_connect_task = databus.connect()
+loop = asyncio.get_event_loop()
+loop.run_until_complete(databus_connect_task)
 
 # Fetch and treat the data
 cars = ct.treat_cars()
@@ -24,6 +35,15 @@ print(cluster_distribution)
 
 # Remove the encoded columns
 cars.drop(['brand_encoded', 'color_encoded', 'name_encoded', 'length_encoded', 'used_encoded'], axis=1, inplace=True)
+
+def transform_data(row):
+    return {
+        "id": row["id"],
+        "category_id": row["category_id"]
+    }
+
+databus_publish_task = databus.publish_result("cars", cars, "id", transform_data, mode="upsert")
+loop.run_until_complete(databus_publish_task)
 
 
 # publish_results()
