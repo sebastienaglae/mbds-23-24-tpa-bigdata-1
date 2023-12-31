@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"strconv"
+	"strings"
 )
 
 type WebOptions struct {
@@ -27,6 +28,30 @@ func (web *Web) Start() error {
 	r.Use(cors.Default())
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(200, "pong")
+	})
+	r.GET("/metrics", func(c *gin.Context) {
+		sb := strings.Builder{}
+		for name, table := range web.tableQueries {
+			rows, err := web.db.Query(c, "SELECT COUNT(*) FROM ("+table+") as t")
+			if err != nil {
+				c.JSON(500, gin.H{"error": err.Error()})
+				return
+			}
+			defer rows.Close()
+
+			var count int
+			if rows.Next() {
+				if err := rows.Scan(&count); err != nil {
+					c.JSON(500, gin.H{"error": err.Error()})
+					return
+				}
+			}
+			rows.Close()
+
+			sb.WriteString(fmt.Sprintf("# HELP table_%s_count The number of rows in table %s\n", name, name))
+			sb.WriteString(fmt.Sprintf("table_%s_count %d\n", name, count))
+		}
+		c.String(200, sb.String())
 	})
 	r.GET("/:table", func(c *gin.Context) {
 		tableName := c.Param("table")
