@@ -1,0 +1,56 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=AglaeSebastien
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'mbds@mbds.com'
+      PGADMIN_DEFAULT_PASSWORD: 'AglaeSebastien'
+    ports:
+      - 8081:80
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes: 
+      - redis:/data
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: AglaeSebastien
+    volumes: 
+      - mongodb:/data/db
+  nats:
+    image: nats
+    ports:
+      - "8222:8222"
+      - "4222:4222"
+    command: "--http_port 8222 -js"
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - grafana-conf:/etc/grafana
+volumes:
+  postgres-db-volume:
+  redis:
+  mongodb:
+  grafana-data:
+  grafana-conf:
