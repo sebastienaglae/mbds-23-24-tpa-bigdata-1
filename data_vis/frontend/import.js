@@ -28,6 +28,15 @@ const svg = d3.select("#bubble-chart")
   .append('g')
   .attr('transform', `translate(${margin.left},${margin.top})`);
 
+  svg.append("text")
+   .attr("x", width / 2)
+   .attr("y", 0 - (margin.top / 2))
+   .attr("text-anchor", "middle")
+   .style("font-size", "16px")
+   .style("text-decoration", "underline")
+   .text("Trend of most popular car brands");
+
+
 // Define scales for price and power
 const priceScale = d3.scaleLinear()
   .domain([0, d3.max(aggregatedData, d => d.avgPrice)+0.1*d3.max(aggregatedData, d => d.avgPrice)]) 
@@ -185,6 +194,15 @@ const brandCounts = resultData.reduce((accumulator,entry) => {
       .append("g")
       .attr("transform", `translate(${stackedBarMargin.left},${stackedBarMargin.top})`);
 
+      svg2.append("text")
+   .attr("x", stackedBarWidth / 2)
+   .attr("y", 0 - (stackedBarMargin.top / 2))
+   .attr("text-anchor", "middle")
+   .style("font-size", "16px")
+   .style("text-decoration", "underline")
+   .text("Customer preferences for car brands depending on gender");
+
+
     // Define color scale
     const color = d3.scaleOrdinal()
       .domain(["Male", "Female"])
@@ -315,6 +333,16 @@ const brandCounts = resultData.reduce((accumulator,entry) => {
           .attr("height", scatterHeight + scatterMargin.top + scatterMargin.bottom)
           .append("g")
           .attr("transform", `translate(${scatterMargin.left},${scatterMargin.top})`);
+          
+
+          svg3.append("text")
+          .attr("x", scatterWidth / 2)
+          .attr("y", 0 - (scatterMargin.top / 2))
+          .attr("text-anchor", "middle")
+          .style("font-size", "16px")
+          .style("text-decoration", "underline")
+          .text("Eco-preferences of clients");
+
         
           const xScatter = d3.scaleLinear()
           .domain([0, d3.max(filteredData, d => d.car.co2_emissions)+0.1*d3.max(filteredData, d => d.car.co2_emissions)])
@@ -335,7 +363,7 @@ const brandCounts = resultData.reduce((accumulator,entry) => {
             .attr("x", scatterWidth/2)
             .attr("y", scatterHeight+0.9*scatterMargin.bottom)
             .style("text-anchor", "middle")
-            .text("CO2 emissions");
+            .text("CO2 emissions (kiloton)");
         
             // Add Y axis
             svg3.append("g")
@@ -348,7 +376,7 @@ const brandCounts = resultData.reduce((accumulator,entry) => {
             .attr("x", 0-scatterHeight/2)
             .attr("y", 0-1.3*scatterMargin.top)
             .style("text-anchor", "middle")
-            .text("Energy cost");
+            .text("Energy cost (euro)");
         
              // Create the grid.
             svg3.append("g")
@@ -498,7 +526,7 @@ const brandCounts = resultData.reduce((accumulator,entry) => {
                               .duration(200)
                               .style('opacity', 0.5);
         
-                          scatterTooltip.html(`<strong>${d.car.brand} ${d.car.name}</strong><br/>CO2 emissions: ${d.car.co2_emissions.toFixed(3)} g/km<br/>Energy cost: ${d.car.energy_cost.toFixed(2)} euro`)
+                          scatterTooltip.html(`<strong>${d.car.brand} ${d.car.name}</strong><br/>CO2 emission: ${d.car.co2_emissions.toFixed(3)} g/km<br/>Energy cost: ${d.car.energy_cost.toFixed(2)} euro`)
                               .transition().duration(200).style('opacity', 0.9)
                               .style("left", (event.pageX + 10) + "px")
                               .style("top", (event.pageY - 20) + "px");
