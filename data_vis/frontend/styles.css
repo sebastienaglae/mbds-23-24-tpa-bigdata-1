@@ -1,0 +1,93 @@
+body {
+  margin: 5px;
+  background-color: #F7EEED;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+h1 {
+  padding-left: 10px;
+  margin: 0;
+}
+
+p {
+  margin: 5px 0 5px 0;
+}
+
+.filter-title {
+  font-weight: bold;
+}
+
+.charts {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.chart {
+  font-family: 'Courier New', Courier, monospace;
+  border: 1px solid #ccc;
+  padding: 10px;
+  height: fit-content;
+  margin: 10px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: row;
+}
+
+.stacked-bar-chart {
+  width: 700px;
+}
+
+#bubble-chart circle {
+  stroke-width: 1px;
+  stroke: black;
+}
+  
+.chart-container {
+  position: relative;
+}
+
+.chart-container rect:hover {
+  opacity: 0.7;
+}
+  
+.chart .axis path,
+.chart .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+  
+.chart text {
+  font-weight: bold;
+  color: #303A52;
+}
+  
+.chart .axis .tick line {
+  stroke-dasharray: 2, 2;
+  margin: 5px;
+}
+  
+.filter {
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  background-color: #E2F4FF;
+  padding: 10px;
+  margin-right: 7px;
+}
+
+.checkbox-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.marital-status-checkbox {
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+}
+.marital-status-checkbox input[type="checkbox"] {
+  margin-right: 5px;
+}
