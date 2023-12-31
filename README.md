@@ -12,6 +12,9 @@
 ![Shell Script](https://img.shields.io/badge/shell_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
 ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 
+## Lien vers le rapport
+[![Rapport](https://img.shields.io/badge/Rapport-000000?style=for-the-badge&logo=markdown&logoColor=white)](./Rapport.pdf)
+
 ## Objetifs
 
 Le projet vise à utiliser les connaissances en Big Data, Data Visualization et Machine Learning pour aider un concessionnaire automobile. Les objectifs incluent la recommandation optimale de modèles de véhicules, la catégorisation des véhicules, et la mise en place d'un Data Lake. Il implique également l'utilisation d'Access Drivers, d'un bus de données, d'outils d'analyse, et la création d'un programme Map/Reduce pour adapter un fichier spécifique.
