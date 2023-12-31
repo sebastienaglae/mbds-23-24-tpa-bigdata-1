@@ -1,9 +1,5 @@
 CREATE TABLE catalog_car_category (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description VARCHAR(255) NOT NULL,
-
-    UNIQUE (name)
+    id INTEGER PRIMARY KEY -- from 0 to .. (number of categories - 1)
 );
 
 CREATE TYPE catalog_car_length AS ENUM ('short', 'medium', 'long', 'very_long');
