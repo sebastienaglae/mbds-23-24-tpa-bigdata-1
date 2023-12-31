@@ -1,4 +1,4 @@
-module databus_connector
+module databus_api
 
 go 1.21
 
