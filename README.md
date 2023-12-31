@@ -22,29 +22,29 @@ Le projet vise à utiliser les connaissances en Big Data, Data Visualization et 
 Le projet nécessite l'analyse exploratoire des données, l'identification des catégories de véhicules, la fusion des données clients et immatriculations, et la création d'un modèle de classification. Un rapport détaillé et des scripts sont requis pour documenter les choix, processus et résultats. En résumé, l'objectif est d'optimiser la recommandation de véhicules en utilisant des techniques avancées d'analyse de données.
 
 ## Informations
-Nom des étudiants :
+**Durée du projet** : 19 Octobre 2023 - 31 décembre 2023
+
+**Nom des étudiants** :
 - AGLAE Sébastien
 - BONE Ernesto
 - CHIAPPE Mike
 - LAPSHINA Valeriia
 - VINCENT Yehoudi
 
-Nom des encadrants :
+**Nom des encadrants** :
 - PASQUIER Nicolas
 - MOPOLO Gabriel
 - SIMONIAN Sergio
 - WINKLER Marco
 
-Tous le projet est hébergé sur 135.181.84.87.
+Tous le projet est hébergé sur **135.181.84.87**. Nous n'avons pas travailler sur des environnements locaux.
 
 ## Acceder aux outils
 Voici les outils:
 - Grafana
-  - [Grafana (TPA Dashboard)](http://135.181.84.87:3000/d/f594fa82-9162-44ab-83be-7cdb84c2fbd5/tpa?orgId=1)
+  - [Acceder au dashboard Grafana](http://135.181.84.87:3000/public-dashboards/3b26974c3fb34f5d83cd0d3deeec0e95)
   - [Documentation](./grafana_sql/description.md)
   - [Requêtes SQL](./grafana_sql)
-  - Id :
-  - Mot de passe :
 ![Grafana dashboard](./grafana_sql/grafana_screenshot.png)
  
 ## Techno
