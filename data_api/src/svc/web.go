@@ -146,6 +146,36 @@ func (web *Web) Start() error {
 
 		c.JSON(200, result)
 	})
+	r.POST("/query", func(c *gin.Context) {
+		var json struct {
+			Query string `json:"query"`
+		}
+
+		if err := c.BindJSON(&json); err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+
+		rows, err := web.db.Query(c, "SELECT json_agg(t) FROM ("+json.Query+") as t")
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		defer rows.Close()
+
+		var result interface{}
+		if rows.Next() {
+			if err = rows.Scan(&result); err != nil {
+				c.JSON(500, gin.H{"error": err.Error()})
+				return
+			}
+			if result == nil {
+				result = []interface{}{}
+			}
+		}
+
+		c.JSON(200, result)
+	})
 
 	return r.Run(":" + strconv.Itoa(web.port))
 }
