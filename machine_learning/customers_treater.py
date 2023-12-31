@@ -43,6 +43,3 @@ def treat_customers():
     customers.to_csv("treated_customers.csv", index=False)
 
     return customers
-
-if __name__ == "__main__":
-    treat_customers()

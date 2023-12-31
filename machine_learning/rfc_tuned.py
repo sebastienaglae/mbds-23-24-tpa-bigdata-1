@@ -26,10 +26,10 @@ def load_and_preprocess_data(prediction_type: str = "carmodel"):
     print("---------- Data retrieved ----------")
     
     if prediction_type == "carmodel":
-        X = customers.drop(["car_brand_name_encoded", "car_category_id"], axis=1)
-        y = customers["car_brand_name_encoded"]
+        X = customers.drop(["car_id", "car_category_id"], axis=1)
+        y = customers["car_id"]
     elif prediction_type == "category":
-        X = customers.drop(["car_category_id", "car_brand_name_encoded"], axis=1)
+        X = customers.drop(["car_category_id", "car_id"], axis=1)
         y = customers["car_category_id"]
         
     return X, y

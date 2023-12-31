@@ -52,7 +52,7 @@ def train_and_save_model(X_train, y_train, prediction_type: str = "carmodel"):
     - RandomForestClassifier: Trained model.
     """
     print(f"---------- Training the RandomForestClassifier for {prediction_type} ----------")
-    rf_classifier = RandomForestRegressor(n_estimators=100, random_state=42)
+    rf_classifier = RandomForestClassifier(n_estimators=100, random_state=42)
     rf_classifier.fit(X_train, y_train)
     
     # Save the model
@@ -90,7 +90,7 @@ def evaluate_regression_model(model, X_test, y_test):
     print(f"R-squared: {r_squared}")
 
 if __name__ == "__main__":
-    prediction_type = "carmodel"
+    prediction_type = "category"
     X, y = load_and_preprocess_data(prediction_type)
     print(f"X shape: {X.shape}")
     print(f"y shape: {y.shape}")
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     # print y data type
     print(f"y data type: {y.dtype}")
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    # rf_model = train_and_save_model(X_train, y_train, prediction_type=prediction_type)
-    # evaluate_model(rf_model, X_test, y_test)
-    rf_regressor = train_and_save_model(X_train, y_train, prediction_type)
-    evaluate_regression_model(rf_regressor, X_test, y_test)
+    rf_model = train_and_save_model(X_train, y_train, prediction_type=prediction_type)
+    evaluate_model(rf_model, X_test, y_test)
+    # rf_regressor = train_and_save_model(X_train, y_train, prediction_type)
+    # evaluate_regression_model(rf_regressor, X_test, y_test)
