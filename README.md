@@ -35,6 +35,7 @@ Le projet nécessite l'analyse exploratoire des données, l'identification des c
 - WINKLER Marco
 
 Tous le projet est hébergé sur **135.181.84.87**.
+La base de la visualisation d3js a été réalisé par Valeriia sur le repo suivant [Github](https://github.com/hunnybunnyv/datavis) avant d'etre intégré a ce repo.
 
 ## Acceder aux outils
 Voici les outils:
