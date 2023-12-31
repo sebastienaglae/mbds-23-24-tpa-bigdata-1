@@ -1,7 +1,7 @@
 package main
 
 import (
-	"databus_connector/src/svc"
+	"databus_api/src/svc"
 	"flag"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"

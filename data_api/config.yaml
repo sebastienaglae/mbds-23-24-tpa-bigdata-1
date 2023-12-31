@@ -1,7 +1,7 @@
 sql:
   connectionString: postgres://postgres:AglaeSebastien@135.181.84.87:5432/mbds_bigdata?sslmode=disable
 web:
-  port: 8080
+  port: 8181
   tables:
     customers: |
       SELECT cus.*, car as car FROM customer as cus
@@ -10,7 +10,10 @@ web:
       JOIN catalog_car as car
       ON reg.car_id = car.id
     customer_marketing: |
-      SELECT * FROM customer_marketing
+      SELECT cus.*, analytics FROM customer_marketing as cus
+      LEFT JOIN customer_markting_analysis_data as analytics
+      ON cus.id = analytics.customer_marketing_id
+
     customer_car_registration: |
         SELECT reg.*, car as car FROM customer_car_registration as reg
         JOIN catalog_car as car
