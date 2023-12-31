@@ -1,4 +1,4 @@
-d3.json('http://135.181.84.87:8181/customers?page=1&size=10000')
+d3.json('http://135.181.84.87:8181/customers?page=10&size=14000')
   .then(function(data) {
     const resultData = data.result; // Get data from the "result" key
     console.log(resultData); // Check your data from the "result" key
@@ -281,301 +281,274 @@ const brandCounts = resultData.reduce((accumulator,entry) => {
         .style("text-anchor", "middle")
         .text("Number of customers");
 
-//3. Scatter plot
-const scatterData = resultData
-console.log(scatterData)
-
-// Filter out data points where either co2_emissions or energy_cost is null
-const filteredData = scatterData.filter(d => d.car.co2_emissions !== null && d.car.energy_cost !== null);
-console.log(filteredData);
-const scatterMargin = { top: 30, right: 20, bottom: 40, left: 50 };
-const scatterWidth = 570 - scatterMargin.left - scatterMargin.right;
-const scatterHeight = 350 - scatterMargin.top - scatterMargin.bottom;
-
-// List of unique brand-name pairs with co2_emissions and energy_cost
-const brandData = resultData.map(d => ({
-    brandName: `${d.car.brand} ${d.car.name}`,
-    co2Emissions: d.car.co2_emissions,
-    energyCost: d.car.energy_cost
-  }));
-  
-  const uniqueBrandData = Array.from(new Set(brandData.map(JSON.stringify).filter(
-    (value, index, self) => {
-      const parsed = JSON.parse(value);
-      return parsed.co2Emissions !== null && parsed.energyCost !== null;
-    }
-  ))).map(JSON.parse);
-  
-  console.log(uniqueBrandData);
-
-// Create SVG element
-  const svg3 = d3.select("#scatter-plot-matrix")
-  .append("svg")
-  .attr("width", scatterWidth + scatterMargin.left + scatterMargin.right)
-  .attr("height", scatterHeight + scatterMargin.top + scatterMargin.bottom)
-  .append("g")
-  .attr("transform", `translate(${scatterMargin.left},${scatterMargin.top})`);
-
-  const xScatter = d3.scaleLinear()
-  .domain([0, d3.max(filteredData, d => d.car.co2_emissions)+0.1*d3.max(filteredData, d => d.car.co2_emissions)])
-  .range([0, scatterWidth]);
-
-  const yScatter = d3.scaleLinear()
-  .domain([0, d3.max(filteredData, d => d.car.energy_cost+0.1*d3.max(filteredData, d => d.car.energy_cost))])
-  .range([scatterHeight, 0]);
-
-    // Add X axis
-    svg3.append("g")
-    .attr("class", "x-axis")
-    .attr("transform", `translate(0,${scatterHeight})`)
-    .call(d3.axisBottom(xScatter));
-
-    // Add X axis label
-    svg3.append("text")
-    .attr("x", scatterWidth/2)
-    .attr("y", scatterHeight+0.9*scatterMargin.bottom)
-    .style("text-anchor", "middle")
-    .text("CO2 emissions");
-
-    // Add Y axis
-    svg3.append("g")
-    .attr("class", "y-axis")
-    .call(d3.axisLeft(yScatter));
-
-    // Add Y axis label
-    svg3.append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("x", 0-scatterHeight/2)
-    .attr("y", 0-1.3*scatterMargin.top)
-    .style("text-anchor", "middle")
-    .text("Energy cost");
-
-     // Create the grid.
-    svg3.append("g")
-    .attr("stroke", "currentColor")
-    .attr("stroke-opacity", 0.1)
-    .call(g => g.append("g")
-        .selectAll("line")
-        .data(xScatter.ticks())
-        .join("line")
-        .attr("x1", d => 0.5 + xScatter(d))
-        .attr("x2", d => 0.5 + xScatter(d))
-        .attr("y1", 0.5)
-        .attr("y2", scatterHeight))
-    .call(g => g.append("g")
-        .selectAll("line")
-        .data(yScatter.ticks())
-        .join("line")
-        .attr("y1", d => 0.5 + yScatter(d))
-        .attr("y2", d => 0.5 + yScatter(d))
-        .attr("x1", 0.5)
-        .attr("x2", scatterWidth));
-
-    // Add a layer of dots
-    svg3.append("g")
-    .attr("stroke", "black")
-    .attr("stroke-width", 0.5)
-    .selectAll("circle")
-    .data(filteredData)
-    .join("circle")
-    .attr("cx", d => xScatter(d.car.co2_emissions))
-    .attr("cy", d => yScatter(d.car.energy_cost))
-    .attr("r", 4)
-    .attr("fill", d => BrandsColorScale(d.car.brand));
-
-    // Creation of a tooltip
-    const scatterTooltip = d3.select('#scatter-plot-matrix')
-    .append('div')
-    .attr('class', 'tooltip')
-    .style('opacity', 0)
-    .attr('class', 'tooltip')
-    .style('position', 'absolute')
-    .style('background-color', 'white')
-    .style('border', 'solid')
-    .style('border-width', '1px')
-    .style('border-radius', '5px')
-    .style('padding', '10px');
-
-    // Adding a tooltip on the chart
-    svg3.selectAll("circle")
-    .on('mouseover', (event, d) => {
-        d3.select(event.currentTarget)
-        .transition()
-        .duration(200)
-        .style('opacity', 0.5)
-        // Set tooltip content and position
-        scatterTooltip.html(`<strong>${d.car.brand} ${d.car.name}</strong><br/>CO2 emissions: ${d.car.co2_emissions.toFixed(3)} g/km <br/>Energy cost: ${d.car.energy_cost.toFixed(2)} euro`)
-        scatterTooltip.transition().duration(200).style('opacity', 0.9)
-        .style("left", (event.pageX + 10) + "px")
-        .style("top", (event.pageY - 20) + "px");
-    })
-
-    .on('mousemove', (event) => {
-        scatterTooltip.style("transform","translateY(-55%)")
-            .style('left',(event.pageX + 10)+'px')
-            .style('top',(event.pageY - 30)+'px');
-        })
-
-    .on('mouseleave', () => {
-        d3.select(event.currentTarget).style('opacity', 1)
-        scatterTooltip.transition().style('opacity', 0);
-        });
-
-    //Zooming a scatter plot
-    const zoom = d3.zoom()
-    .scaleExtent([1, 40])
-    .extent([[0, 0], [scatterWidth, scatterHeight]])
-    .on("zoom", zoomed);
-
-    svg3.call(zoom);
-
-    function zoomed({transform}) {
-    const zx = transform.rescaleX(xScatter).interpolate(d3.interpolateRound);
-    const zy = transform.rescaleY(yScatter).interpolate(d3.interpolateRound);
-
-    svg3.selectAll("circle")
-        .attr("cx", d => zx(d.car.co2_emissions))
-        .attr("cy", d => zy(d.car.energy_cost));
-
-    svg3.selectAll(".x-axis").call(d3.axisBottom(zx));
-    svg3.selectAll(".y-axis").call(d3.axisLeft(zy));
-    }
-
-    const defs = svg3.append("defs");
-
-    // Male filter field
-    const maleFilter = defs.append("filter")
-        .attr("id", "maleFilter")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("width", scatterWidth)
-        .attr("height", scatterHeight);
-
-    maleFilter.append("feColorMatrix")
-        .attr("type", "matrix")
-        .attr("values", "1 0 0 0 0 0 0.3 0 0 0 0 0 1 0 0 0 0 0 0.3 0");
-
-    // Female filter field
-    const femaleFilter = defs.append("filter")
-        .attr("id", "femaleFilter")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("width", scatterWidth)
-        .attr("height", scatterHeight);
-
-    femaleFilter.append("feColorMatrix")
-        .attr("type", "matrix")
-        .attr("values", "0.3 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0");
-
-    // Create checkboxes
-const maleCheckbox = d3.select("#male-checkbox");
-const femaleCheckbox = d3.select("#female-checkbox");
-
-    // Function to update the scatter plot
-    function updateScatterPlot() {
-        const isMaleChecked = maleCheckbox.property("checked");
-        const isFemaleChecked = femaleCheckbox.property("checked");
-
-        svg3.selectAll("circle")
-            .attr("filter", null); // Filter is removed by default
-
-        if (isMaleChecked && !isFemaleChecked) {
-            svg3.selectAll("circle")
-                .filter(d => d.gender === "M")
-                .attr("filter", "url(#maleFilter)");
-
-        } else if (isFemaleChecked && !isMaleChecked) {
-            svg3.selectAll("circle")
-                .filter(d => d.gender === "F")
-                .attr("filter", "url(#femaleFilter)");
-                
-        } else if (isMaleChecked && isFemaleChecked) {
-          // If both checkboxes are checked, show all circles
-          svg3.selectAll("circle")
-              .style("display", "block");
-        } else {
-          // If both checkboxes are unchecked, show all circles
-          svg3.selectAll("circle")
-              .style("display", "none");
-      }
-    }
-
-    // Update scatter plot when checkboxes are changed
-    maleCheckbox.on("change", updateScatterPlot);
-    femaleCheckbox.on("change", updateScatterPlot);
-
-    // show unique values of marital_status in the console 
-    const uniqueMaritalStatus = [...new Set(resultData.map(d => d.marital_status))];
-    console.log(uniqueMaritalStatus);
-
-        // Get the container to which you want to add checkboxes
-        const checkboxContainer = document.getElementById('checkbox-container');
-
-        // Function to update filtration based on selected marital statuses
-        function updateMaritalStatusFilter() {
-          const selectedMaritalStatuses = [];
-
-        // Iterate through marital status checkboxes to get selected statuses
-        document.querySelectorAll('.marital-status-checkbox input[type="checkbox"]').forEach(checkbox => {
-            if (checkbox.checked) {
-                selectedMaritalStatuses.push(checkbox.id.replace('-checkbox', ''));
+        //3. Scatter plot
+        const scatterData = resultData
+        console.log(scatterData)
+        
+        // Filter out data points where either co2_emissions or energy_cost is null
+        const filteredData = scatterData.filter(d => d.car.co2_emissions !== null && d.car.energy_cost !== null);
+        console.log(filteredData);
+        const scatterMargin = { top: 30, right: 20, bottom: 40, left: 50 };
+        const scatterWidth = 570 - scatterMargin.left - scatterMargin.right;
+        const scatterHeight = 350 - scatterMargin.top - scatterMargin.bottom;
+        
+        // List of unique brand-name pairs with co2_emissions and energy_cost
+        const brandData = resultData.map(d => ({
+            brandName: `${d.car.brand} ${d.car.name}`,
+            co2Emissions: d.car.co2_emissions,
+            energyCost: d.car.energy_cost
+          }));
+          
+          const uniqueBrandData = Array.from(new Set(brandData.map(JSON.stringify).filter(
+            (value, index, self) => {
+              const parsed = JSON.parse(value);
+              return parsed.co2Emissions !== null && parsed.energyCost !== null;
             }
-        });
-
-        // Filter based on selected marital statuses
-        if (selectedMaritalStatuses.length > 0) {
+          ))).map(JSON.parse);
+          
+          console.log(uniqueBrandData);
+        
+        // Create SVG element
+          const svg3 = d3.select("#scatter-plot-matrix")
+          .append("svg")
+          .attr("width", scatterWidth + scatterMargin.left + scatterMargin.right)
+          .attr("height", scatterHeight + scatterMargin.top + scatterMargin.bottom)
+          .append("g")
+          .attr("transform", `translate(${scatterMargin.left},${scatterMargin.top})`);
+        
+          const xScatter = d3.scaleLinear()
+          .domain([0, d3.max(filteredData, d => d.car.co2_emissions)+0.1*d3.max(filteredData, d => d.car.co2_emissions)])
+          .range([0, scatterWidth]);
+        
+          const yScatter = d3.scaleLinear()
+          .domain([0, d3.max(filteredData, d => d.car.energy_cost+0.1*d3.max(filteredData, d => d.car.energy_cost))])
+          .range([scatterHeight, 0]);
+        
+            // Add X axis
+            svg3.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", `translate(0,${scatterHeight})`)
+            .call(d3.axisBottom(xScatter));
+        
+            // Add X axis label
+            svg3.append("text")
+            .attr("x", scatterWidth/2)
+            .attr("y", scatterHeight+0.9*scatterMargin.bottom)
+            .style("text-anchor", "middle")
+            .text("CO2 emissions");
+        
+            // Add Y axis
+            svg3.append("g")
+            .attr("class", "y-axis")
+            .call(d3.axisLeft(yScatter));
+        
+            // Add Y axis label
+            svg3.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", 0-scatterHeight/2)
+            .attr("y", 0-1.3*scatterMargin.top)
+            .style("text-anchor", "middle")
+            .text("Energy cost");
+        
+             // Create the grid.
+            svg3.append("g")
+            .attr("stroke", "currentColor")
+            .attr("stroke-opacity", 0.1)
+            .call(g => g.append("g")
+                .selectAll("line")
+                .data(xScatter.ticks())
+                .join("line")
+                .attr("x1", d => 0.5 + xScatter(d))
+                .attr("x2", d => 0.5 + xScatter(d))
+                .attr("y1", 0.5)
+                .attr("y2", scatterHeight))
+            .call(g => g.append("g")
+                .selectAll("line")
+                .data(yScatter.ticks())
+                .join("line")
+                .attr("y1", d => 0.5 + yScatter(d))
+                .attr("y2", d => 0.5 + yScatter(d))
+                .attr("x1", 0.5)
+                .attr("x2", scatterWidth));
+        
+            // Add a layer of dots
+            svg3.append("g")
+            .attr("stroke", "black")
+            .attr("stroke-width", 0.5)
+            .selectAll("circle")
+            .data(filteredData)
+            .join("circle")
+            .attr("cx", d => xScatter(d.car.co2_emissions))
+            .attr("cy", d => yScatter(d.car.energy_cost))
+            .attr("r", 4)
+            .attr("fill", d => BrandsColorScale(d.car.brand));
+        
+            // Creation of a tooltip
+            const scatterTooltip = d3.select('#scatter-plot-matrix')
+            .append('div')
+            .attr('class', 'tooltip')
+            .style('opacity', 0)
+            .attr('class', 'tooltip')
+            .style('position', 'absolute')
+            .style('background-color', 'white')
+            .style('border', 'solid')
+            .style('border-width', '1px')
+            .style('border-radius', '5px')
+            .style('padding', '10px');
+        
+            // Adding a tooltip on the chart
             svg3.selectAll("circle")
-                .style("display", d => selectedMaritalStatuses.includes(d.marital_status) ? "block" : "none");
-        } else {
-            // Show all circles if no marital status checkbox is selected
+            .on('mouseover', (event, d) => {
+                d3.select(event.currentTarget)
+                .transition()
+                .duration(200)
+                .style('opacity', 0.5)
+                // Set tooltip content and position
+                scatterTooltip.html(`<strong>${d.car.brand} ${d.car.name}</strong><br/>CO2 emissions: ${d.car.co2_emissions.toFixed(3)} g/km <br/>Energy cost: ${d.car.energy_cost.toFixed(2)} euro`)
+                scatterTooltip.transition().duration(200).style('opacity', 0.9)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+            })
+        
+            .on('mousemove', (event) => {
+                scatterTooltip.style("transform","translateY(-55%)")
+                    .style('left',(event.pageX + 10)+'px')
+                    .style('top',(event.pageY - 30)+'px');
+                })
+        
+            .on('mouseleave', () => {
+                d3.select(event.currentTarget).style('opacity', 1)
+                scatterTooltip.transition().style('opacity', 0);
+                });
+        
+            //Zooming a scatter plot
+            const zoom = d3.zoom()
+            .scaleExtent([1, 40])
+            .extent([[0, 0], [scatterWidth, scatterHeight]])
+            .on("zoom", zoomed);
+        
+            svg3.call(zoom);
+        
+            function zoomed({transform}) {
+            const zx = transform.rescaleX(xScatter).interpolate(d3.interpolateRound);
+            const zy = transform.rescaleY(yScatter).interpolate(d3.interpolateRound);
+        
             svg3.selectAll("circle")
-                .style("display", "block");
-        }
-      }
+                .attr("cx", d => zx(d.car.co2_emissions))
+                .attr("cy", d => zy(d.car.energy_cost));
+        
+            svg3.selectAll(".x-axis").call(d3.axisBottom(zx));
+            svg3.selectAll(".y-axis").call(d3.axisLeft(zy));
+            }
+        
+            const defs = svg3.append("defs");
+        
+            // Male filter field
+            const maleFilter = defs.append("filter")
+                .attr("id", "maleFilter")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", scatterWidth)
+                .attr("height", scatterHeight);
+        
+            maleFilter.append("feColorMatrix")
+                .attr("type", "matrix")
+                .attr("values", "1 0 0 0 0 0 0.3 0 0 0 0 0 1 0 0 0 0 0 0.3 0");
+        
+            // Female filter field
+            const femaleFilter = defs.append("filter")
+                .attr("id", "femaleFilter")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", scatterWidth)
+                .attr("height", scatterHeight);
+        
+            femaleFilter.append("feColorMatrix")
+                .attr("type", "matrix")
+                .attr("values", "0.3 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0");
+        
+            // Fonction pour mettre à jour le graphe de dispersion
+            function updateScatterPlotWithFilters() {
+              // Récupérer les états des checkboxes
+              const isMaleChecked = maleCheckbox.property("checked");
+              const isFemaleChecked = femaleCheckbox.property("checked");
+              const selectedMaritalStatuses = Array.from(document.querySelectorAll('.marital-status-checkbox input[type="checkbox"]:checked'))
+                  .map(checkbox => checkbox.id.replace('-checkbox', ''));
 
-      // Attach change event listeners to marital status checkboxes
-      document.querySelectorAll('.marital-status-checkbox input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', updateMaritalStatusFilter);
-      });
+              // Filtrer les données en fonction des sélections
+              const filtered = filteredData.filter(d => {
+                  const genderMatch = (isMaleChecked && d.gender === "M") || (isFemaleChecked && d.gender === "F");
+                  const maritalStatusMatch = selectedMaritalStatuses.length === 0 || selectedMaritalStatuses.includes(d.marital_status);
+                  return genderMatch && maritalStatusMatch;
+              });
+        
+                  // Supprimer les anciens points et ajouter les nouveaux
+                  svg3.selectAll("circle").remove();
+                  svg3.selectAll("circle")
+                      .data(filtered)
+                      .enter()
+                      .append("circle")
+                      .attr("cx", d => xScatter(d.car.co2_emissions))
+                      .attr("cy", d => yScatter(d.car.energy_cost))
+                      .attr("r", 4)
+                      .attr("fill", d => BrandsColorScale(d.car.brand))
+                      .on('mouseover', function (event, d) {
+                          d3.select(event.currentTarget)
+                              .transition()
+                              .duration(200)
+                              .style('opacity', 0.5);
+        
+                          scatterTooltip.html(`<strong>${d.car.brand} ${d.car.name}</strong><br/>CO2 emissions: ${d.car.co2_emissions.toFixed(3)} g/km<br/>Energy cost: ${d.car.energy_cost.toFixed(2)} euro`)
+                              .transition().duration(200).style('opacity', 0.9)
+                              .style("left", (event.pageX + 10) + "px")
+                              .style("top", (event.pageY - 20) + "px");
+                      })
+                      .on('mousemove', function (event) {
+                          scatterTooltip.style("transform","translateY(-55%)")
+                              .style('left', (event.pageX + 10) + 'px')
+                              .style('top', (event.pageY - 30) + 'px');
+                      })
+                      .on('mouseleave', function () {
+                          d3.select(event.currentTarget).style('opacity', 1);
+                          scatterTooltip.transition().style('opacity', 0);
+                      });
+        
+              }
 
+              // Création de checkboxes pour chaque statut marital unique
+                  const uniqueMaritalStatus = [...new Set(resultData.map(d => d.marital_status))];
+                  const checkboxContainer = document.getElementById('checkbox-container');
 
-        /// Iterate through unique statuses and create checkboxes
-        uniqueMaritalStatus.forEach(status => {
+                  uniqueMaritalStatus.forEach(status => {
+                    const div = document.createElement('div');
+                    div.className = 'marital-status-checkbox';
 
-          // Create div for checkbox and label
-          const div = document.createElement('div');
-          div.className = 'marital-status-checkbox';
-    
-          // Create checkbox
-          const checkbox = document.createElement('input');
-          checkbox.type = 'checkbox';
-          checkbox.id = status.toLowerCase() + '-checkbox'; // Assign unique IDs if needed
-          checkbox.checked = true; // Check all checkboxes by default
-    
-          // Create label
-          const label = document.createElement('label');
-          label.htmlFor = checkbox.id;
-          label.textContent = status;
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = status.toLowerCase().replace(/\s+/g, '-') + '-checkbox';
 
-          // Append checkbox and label to the div
-          div.appendChild(checkbox);
-          div.appendChild(label);
+                    const label = document.createElement('label');
+                    label.htmlFor = checkbox.id;
+                    label.textContent = status;
 
-          // Append div to the container
-          checkboxContainer.appendChild(div);
-        });
-    
-        // Initial update
-        updateScatterPlot();
-        updateMaritalStatusFilter();
+                    div.appendChild(checkbox);
+                    div.appendChild(label);
+                    checkboxContainer.appendChild(div);
+                  });
+        
+                // Attacher les gestionnaires d'événements aux checkboxes
+                const maleCheckbox = d3.select("#male-checkbox");
+                const femaleCheckbox = d3.select("#female-checkbox");
 
+                maleCheckbox.on("change", updateScatterPlotWithFilters);
+                femaleCheckbox.on("change", updateScatterPlotWithFilters);
+                document.querySelectorAll('.marital-status-checkbox input[type="checkbox"]').forEach(checkbox => {
+                  checkbox.addEventListener('change', updateScatterPlotWithFilters);
+                });
 
-
-
-
-
-
-})
+                // Initial update
+                updateScatterPlotWithFilters();
+              })
 
   .catch(error => {
     console.error('Error while import data:', error);
