@@ -113,7 +113,11 @@ func (web *Web) Start() error {
 	r.GET("/api/:table", func(c *gin.Context) {
 		tableName := c.Param("table")
 
-		defaultQuery := "SELECT * FROM " + tableName
+		defaultQuery, ok := web.tableQueries[tableName]
+		if !ok {
+			c.JSON(404, gin.H{"error": "table not found"})
+			return
+		}
 
 		filter := c.DefaultQuery("where", "")
 		sort := c.DefaultQuery("sortby", "")
