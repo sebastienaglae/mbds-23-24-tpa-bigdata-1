@@ -46,9 +46,11 @@ Voici les outils:
   - [Acceder au dashboard Grafana](http://135.181.84.87:3000/public-dashboards/3b26974c3fb34f5d83cd0d3deeec0e95)
   - [Documentation](./grafana_sql/description.md)
   - [Requêtes SQL](./grafana_sql)
+  - [Projet](./grafana_sql)
 ![Grafana dashboard](./grafana_sql/grafana_screenshot.png)
 - API
   - [Acceder a Postman](https://www.postman.com/red-spaceship-151642/workspace/grails/collection/14060252-3261c536-7dac-4a53-8b8c-6f5cd131cb31?action=share&creator=14060252)
+  - [Projet](./data_api)
  
 ## Techno
 Notre stack :
