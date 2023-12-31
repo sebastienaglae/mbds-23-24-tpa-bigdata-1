@@ -1,0 +1,25 @@
+sql:
+  connectionString: postgres://postgres:AglaeSebastien@135.181.84.87:5432/mbds_bigdata?sslmode=disable
+web:
+  port: 8080
+  tables:
+    customers: |
+      SELECT cus.*, car as car FROM customer as cus
+      JOIN customer_car_registration as reg
+      ON cus.current_registration_id = reg.registration_id
+      JOIN catalog_car as car
+      ON reg.car_id = car.id
+    customer_marketing: |
+      SELECT * FROM customer_marketing
+    customer_car_registration: |
+        SELECT reg.*, car as car FROM customer_car_registration as reg
+        JOIN catalog_car as car
+        ON reg.car_id = car.id
+    cars: |
+      SELECT car.*, cat FROM catalog_car as car
+      LEFT JOIN catalog_car_category as cat
+      ON cat.id = car.category_id
+    car_categories: |
+        SELECT * FROM catalog_car_category
+    brand_co2_emission: |
+        SELECT * FROM brand_co2_emissions

@@ -1,2 +1,3 @@
 __pycache__/
 /data_upload/files/
+.DS_Store

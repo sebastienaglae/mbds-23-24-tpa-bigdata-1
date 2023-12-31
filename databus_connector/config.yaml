@@ -1,5 +1,5 @@
 sql:
-  connectionString: postgres://root:@localhost:26257/mbds_bigdata?sslmode=disable
+  connectionString: postgres://postgres:AglaeSebastien@135.181.84.87:5432/mbds_bigdata?sslmode=disable
 nats:
   url: nats://135.181.84.87:4222
 connector:
@@ -8,5 +8,6 @@ connector:
     consumer:
       new: NEW
       update: UPDATE
+      upsert: UPSERT
       delete: DELETE
   database: mbds_bigdata
