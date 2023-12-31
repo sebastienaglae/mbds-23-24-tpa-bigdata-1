@@ -35,21 +35,7 @@ func (s *NatsStream) Close() {
 	s.conn.Close()
 }
 
-func (s *NatsStream) InitStream(streamConfig jetstream.StreamConfig, consumerConfigs []jetstream.ConsumerConfig) error {
-	if _, err := s.js.CreateStream(context.Background(), streamConfig); err != nil {
-		log.Error().Err(err).Msg("failed to create stream")
-		return err
-	}
-	for _, consumerConfig := range consumerConfigs {
-		if _, err := s.js.CreateConsumer(context.Background(), streamConfig.Name, consumerConfig); err != nil {
-			log.Error().Err(err).Msg("failed to create consumer")
-			return err
-		}
-	}
-	return nil
-}
-
-func (s *NatsStream) Consume(streamName, consumerName string, cb func(msg jetstream.Msg) error) (jetstream.ConsumeContext, error) {
+func (s *NatsStream) Consume(streamName, consumerName string, h func(msg jetstream.Msg, cb func(err error)) error) (jetstream.ConsumeContext, error) {
 	stream, err := s.js.Stream(context.Background(), streamName)
 	if err != nil {
 		return nil, err
@@ -60,12 +46,16 @@ func (s *NatsStream) Consume(streamName, consumerName string, cb func(msg jetstr
 	}
 	log.Debug().Str("stream", streamName).Str("consumer", consumerName).Msg("start consuming")
 	return cons.Consume(func(msg jetstream.Msg) {
-		if err := cb(msg); err != nil {
-			log.Error().Err(err).Msg("failed to consume message")
-			msg.Nak()
-			return
-		} else {
-			msg.Ack()
+		cb := func(err error) {
+			if err != nil {
+				log.Error().Err(err).Msg("failed to consume message")
+				msg.Nak()
+			} else {
+				msg.Ack()
+			}
 		}
-	})
+		if err := h(msg, cb); err != nil {
+			cb(err)
+		}
+	}, jetstream.PullMaxMessages(50000))
 }

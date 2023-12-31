@@ -28,6 +28,9 @@ func NewContext(opts *Options) (*Context, error) {
 }
 
 func (ctx *Context) Start() error {
+	if err := ctx.SqlDatabase.Start(); err != nil {
+		return err
+	}
 	if err := ctx.Connector.Start(); err != nil {
 		return err
 	}
