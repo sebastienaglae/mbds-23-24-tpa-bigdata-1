@@ -8,6 +8,10 @@
             "port": 6379,
             "password": "",
             "db": 0
+        },
+        "MongoDB": {
+            "connection_string": "mongodb://root:AglaeSebastien@135.181.84.87:27017/",
+            "database": "bigdata"
         }
     },
     "files": [
@@ -40,17 +44,10 @@
             }
         },
         {
-            "path": "files/Marketing.csv",
-            "target": {
-                "type": "HDFS",
-                "path": "/data_wharehouse/Marketing.csv"
-            }
-        },
-        {
             "path": "files/Catalogue.csv",
             "target": {
-                "type": "HDFS",
-                "path": "/data_wharehouse/Catalogue.csv"
+                "type": "MongoDB",
+                "collection": "Catalogue"
             }
         },
         {

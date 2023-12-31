@@ -27,6 +27,4 @@ class RedisTarget:
                     print(json_row)
                     self.driver.client.rpush(self.list_key, json_row)
         else:
-            with open(in_path, "r") as reader:
-                data = reader.read()
-                self.driver.client.rpush(self.list_key, data)
+            raise ValueError("Only csv files are supported")

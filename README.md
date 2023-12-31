@@ -48,6 +48,9 @@ Voici les outils:
 - API
   - [Acceder a Postman](https://www.postman.com/red-spaceship-151642/workspace/grails/collection/14060252-3261c536-7dac-4a53-8b8c-6f5cd131cb31?action=share&creator=14060252)
   - [Projet](./data_api)
+- [Environement](./env)
+- [Databus](./databus_connector)
+
  
 ## Techno
 Notre stack :
@@ -60,6 +63,7 @@ Notre stack :
 - Go
 - Python
 - Grafana
+- D3.js
 
 Nos programmes :
 - Données API : go, postgres
@@ -72,13 +76,14 @@ Nos programmes :
 ## Description de la hierarchie du projet
 ```bash
 .
-├── data_api
-├── data_extractor
-├── data_treater
-├── data_upload
-├── databus_connector
-├── grafana_sql
-├── kafka
-├── machine_learning
-└── sql_script
+├── data_api # API pour acceder aux données de la base de données SQL
+├── data_treater # Traitement des données stockées dans les différentes sources
+├── data_upload # Insertion des données traitées dans les différentes sources
+├── databus_connector # Connecteur entre le databus et la base de données SQL
+├── grafana_sql # Dashboard Grafana (visualisation des données SQL)
+├── machine_learning # Machine learning (classification des véhicules et clients marketing)
+└── sql_script # Script SQL pour la création de la base de données SQL
 ```
+
+## Description de notre infrastructure
+Notre infrastructure est composé d'une stack Docker qui fait tourner la plupart de nos services (Postgres, Mongo, Redis, Grafana, Nats Jetstream, Frontend D3.js, jobs Traitement/Insertion des données, API, Databus Connector, Machine Learning, Spark) et d'un serveur Hadoop. Le contenu de notre stack docker est disponible dans le dossier [env](./env).

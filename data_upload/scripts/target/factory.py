@@ -4,7 +4,8 @@ from target.hdfs import HdfsDriver, HdfsTarget
 DRIVERS = {}
 TARGETS = {
     'HDFS': lambda driver, target: HdfsTarget(driver, target['path']),
-    "Redis": lambda driver, target: RedisTarget(driver, target['key'])
+    "Redis": lambda driver, target: RedisTarget(driver, target['key']),
+    "MongoDB": lambda driver, target: MongoTarget(driver, target['collection']),
 }
 
 def init_driver(driver_confs):
@@ -16,6 +17,8 @@ def init_driver(driver_confs):
             DRIVERS[drive_conf_name] = HdfsDriver(drive_conf['url'])
         elif drive_conf_name == 'Redis':
             DRIVERS[drive_conf_name] = RedisDriver(drive_conf['host'], drive_conf['port'], drive_conf['password'], drive_conf['db'])
+        elif drive_conf_name == 'MongoDB':
+            DRIVERS[drive_conf_name] = MongoDriver(drive_conf['connection_string'], drive_conf['database'])
         else:
             raise ValueError("Driver {} not supported".format(drive_conf_name))
 
