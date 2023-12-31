@@ -1,10 +1,10 @@
 CREATE TABLE brand_co2_emissions (
-    brand VARCHAR(255) NOT NULL,
+    brand VARCHAR(32) NOT NULL,
     car_name VARCHAR(255) NOT NULL,
 
-    bonus_malus NUMERIC,
-    co2_emissions NUMERIC,
-    energy_cost NUMERIC,
+    bonus_malus NUMERIC CHECK (bonus_malus >= -15000 AND bonus_malus <= 15000),
+    co2_emissions NUMERIC CHECK (co2_emissions >= 0 AND co2_emissions <= 500),
+    energy_cost NUMERIC CHECK (energy_cost >= 0 AND energy_cost <= 2000),
 
     PRIMARY KEY (brand, car_name)
 );

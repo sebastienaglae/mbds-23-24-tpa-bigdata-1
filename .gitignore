@@ -1,3 +1,15 @@
 __pycache__/
 /data_upload/files/
 .DS_Store
+
+random_forest_model.joblib
+neural_network_model.joblib
+mean_shift_model.joblib
+bayesian_gmm_model.joblib
+brand_encoder.joblib
+treated_customers.csv
+predictions.csv
+stacking_classifier_model.joblib
+random_forest_model_tuned.joblib
+random_forest_prediction_carmodel.joblib
+random_forest_prediction_category.joblib
