@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/nats-io/nats.go/jetstream"
+	"github.com/rs/zerolog/log"
 	"strconv"
 	"strings"
 )
