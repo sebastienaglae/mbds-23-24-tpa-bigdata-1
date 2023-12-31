@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/nats-io/nats.go/jetstream"
+	"github.com/rs/zerolog/log"
+	"strconv"
 	"strings"
 )
 
@@ -72,8 +74,44 @@ func (s *Connector) GetHandler(handlerType string) func(msg jetstream.Msg) error
 	}
 }
 
-func (s *Connector) onNew(msg jetstream.Msg) error {
-	tableName, dataKey, dataValue, err := parseMessageData(msg)
+func (s *Connector) onNew(msg jetstream.Msg, cb func(err error)) error {
+	return errors.New("not implemented")
+}
+
+func (s *Connector) onUpdate(msg jetstream.Msg, cb func(err error)) error {
+	tableName, tablePks, attrs, err := parseMessageData(msg)
+	if err != nil {
+		return err
+	}
+
+	reqStr := "UPDATE %s SET %s WHERE %s"
+	updates := make([]string, 0)
+	args := make([]interface{}, 0)
+	where := make([]string, 0)
+	for k, v := range attrs {
+		// if value is not a map, then it's a primitive type
+		if _, ok := v.(map[string]interface{}); !ok {
+			args = append(args, v)
+			updates = append(updates, k+"=$"+strconv.Itoa(len(args)))
+		} else {
+			return errors.New("nested update not supported")
+		}
+	}
+	for _, pk := range tablePks {
+		where = append(where, pk+"=$"+strconv.Itoa(len(args)+1))
+		args = append(args, attrs[pk])
+	}
+	reqStr = fmt.Sprintf(reqStr,
+		tableName,
+		strings.Join(updates, ","),
+		strings.Join(where, " AND "))
+	log.Debug().Str("table", tableName).Str("pk", strings.Join(tablePks, ",")).Str("query", reqStr).Msg("update")
+	s.db.Queue(reqStr, args, cb)
+	return nil
+}
+
+func (s *Connector) onUpsert(msg jetstream.Msg, cb func(err error)) error {
+	tableName, tablePks, attrs, err := parseMessageData(msg)
 	if err != nil {
 		return err
 	}
